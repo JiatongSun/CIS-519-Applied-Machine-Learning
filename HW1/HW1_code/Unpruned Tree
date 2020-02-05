@@ -1,0 +1,4 @@
+digraph Tree {
+node [shape=box] ;
+0 [label="entropy = 0.419\nsamples = 7326\nvalue = [6704, 622]"] ;
+}

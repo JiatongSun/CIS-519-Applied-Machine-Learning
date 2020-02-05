@@ -1,0 +1,116 @@
+% --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{algorithmicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage[noabbrev]{cleveref}
+\usepackage{courier}
+\usepackage{listings}
+
+
+
+
+\oddsidemargin 0in
+\evensidemargin 0in
+\textwidth 6.5in
+\topmargin -0.5in
+\textheight 9.0in
+
+\newcommand{\ignore}[1]{}
+\def\pp{\par\noindent}
+
+\newcommand{\assignment}[4]{
+\thispagestyle{plain}
+\newpage
+\setcounter{page}{1}
+\noindent
+\begin{center}
+\framebox{ \vbox{ \hbox to 6.28in
+{CIS 419/519: Applied Machine Learning \hfill #1}
+\vspace{4mm}
+\hbox to 6.28in
+{\hspace{2.5in}\large\bf\mbox{Homework #2}}
+\vspace{4mm}
+\hbox to 6.28in
+{{\it Handed Out: #3 \hfill Due: #4}}
+}}
+\end{center}
+}
+
+\makeatletter
+\renewcommand{\fnum@algorithm}{\fname@algorithm}
+\makeatother
+
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
+\lstset{framextopmargin=50pt,frame=bottomline}
+
+
+\begin{document}
+
+\assignment{Spring 2020}{0}{January 22}{January 27}
+
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+
+
+{\bf Name: }  Jiatong Sun\\
+
+{\bf PennKey:} jtsun\\
+
+{\bf PennID:} 53378755
+
+
+\section{Multiple Choice \& Written Questions}
+\begin{enumerate}
+\item[1.] 
+\begin{itemize}
+\item [a.]   C% Just put the capital letter of your answer
+\item [b.]   A% after to the corresponding E.g., \item[c.]  A
+\end{itemize}
+
+\item[2.] 
+\begin{itemize}
+\item [a.]   D% Please don't change anything else about the spacing
+\item [b.]   A% or formatting of this answer template.
+\end{itemize}
+
+\item[3.] 
+  \begin{itemize}
+  \item [a.] D% The reason we're having you use this format is
+  \item [b.] C% that it makes it much easier for us to grade.
+  \end{itemize}
+
+\item[4.] 
+  \begin{itemize}
+  \item[a.] B% Thanks for your help!
+  \item[b.] Proof:
+	\begin{equation*} 
+		\begin{split}
+		Var(X) &= E[(X-E[X])^2]\\
+		&= E[X^2 - 2X \cdot E[X] + E[X]^2]\\
+		&= E[X^2] - 2 \cdot E[X] \cdot E[X] + E[E[X]^2]\\
+		&= E[X^2] - 2E[X]^2 + E[X]^2\\
+		&= E[X^2] - E[X]^2
+		\end{split}
+  	\end{equation*}
+  % Put your proof here and use as many lines as you'd like!
+  \end{itemize}
+ \vspace{80 mm}
+\end{enumerate}
+
+\section{Python Programming Questions}
+
+Complete questions 5 and 6 in the iPython notebook.
+
+\end{document} 
