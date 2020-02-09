@@ -1,12 +1,9 @@
 import pandas as pd
 
 import numpy as np
-from numpy import linalg as LA
 from numpy.linalg import inv
 
-import matplotlib.pyplot as plt
-
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 
 '''
     Linear Regression via Gradient Descent

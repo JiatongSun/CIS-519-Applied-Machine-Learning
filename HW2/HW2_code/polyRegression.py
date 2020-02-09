@@ -1,12 +1,11 @@
 import pandas as pd
 
 import numpy as np
-from numpy import linalg as LA
-from numpy.linalg import inv
-
+from numpy.linalg import norm
 import matplotlib.pyplot as plt
 
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import GridSearchCV
 
 #-----------------------------------------------------------------
 #  Class PolynomialRegression
@@ -15,17 +14,18 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 class PolynomialRegression:
 
     def __init__(self, degree = 1, regLambda = 1E-8
-                 , tuneLambda = False, regLambdaValues = None):
+                 , tuneLambda = False, regLambdaValues = np.array([])):
         '''
         Constructor
         '''
         self.degree = degree
         self.regLambda = regLambda
+        self.tuneLambda = tuneLambda
+        self.regLambdaValues = regLambdaValues
         self.JHist = None
-#        self.theta = np.random.randn(degree+1).reshape(-1,1)
         self.theta = np.random.randn(degree+1).reshape(-1,1)
         self.alpha = 0.1
-        self.thresh = 1E-3
+        self.thresh = 1E-2
 
 
     def polyfeatures(self, X, degree):
@@ -68,6 +68,14 @@ class PolynomialRegression:
         y = y.to_numpy()
         n = len(y)
         X = np.c_[np.ones((n,1)), X]     # Add a row of ones for the bias term
+        
+        if self.tuneLambda and self.regLambdaValues.size > 0:
+            model = Ridge()
+            grid = GridSearchCV(estimator = model,
+                                param_grid = dict(alpha = self.regLambdaValues))
+            grid.fit(X,y.reshape(-1,1))
+            self.regLambda = grid.best_params_.get('alpha')
+            print(f'best lambda: {self.regLambda}')
 
         self.theta = self.gradientDescent(X,y,self.theta)
         
@@ -134,20 +142,19 @@ class PolynomialRegression:
         y = y.reshape(-1,1)
         self.JHist = []
         iter_num = 0
-        last_cost = 1E8
         while True:
-            cur_cost = self.computeCost(X, y, theta)
-            self.JHist.append( (cur_cost, theta) )
-            print("Iteration: ", iter_num+1, 
-                  " Cost: ", self.JHist[iter_num][0], 
-                  " Theta.T: ", theta.T)
-            if abs(last_cost - cur_cost) < self.thresh:
+            cost = self.computeCost(X, y, theta)
+            self.JHist.append( (cost, theta) )
+            if iter_num > 0 and\
+                norm(theta - self.JHist[-2][-1]) < self.thresh:
+                print("Iteration: ", iter_num+1, 
+                  " \nCost: ", self.JHist[iter_num][0], 
+                  " \nTheta:\n ", theta)
                 break
             yhat = np.dot(X,theta)
             theta = theta*(1-self.alpha*self.regLambda)\
                     -np.dot(X.T, (yhat-y)) * (self.alpha / n)
             iter_num += 1
-            last_cost = cur_cost
         return theta
     
     
@@ -165,7 +172,9 @@ def test_polyreg_univariate():
 
     # regression with degree = d
     d = 8
-    model = PolynomialRegression(degree = d, regLambda = 0.0001)
+    
+    # no regularization
+    model = PolynomialRegression(degree = d, regLambda = 0)
     model.fit(X, y)
     
     # output predictions
@@ -173,12 +182,33 @@ def test_polyreg_univariate():
     ypoints = model.predict(xpoints)
 
     # plot curve
-    plt.figure()
+    plt.figure(1,figsize=(16,9))
     plt.plot(X, y, 'rx')
-    plt.title('PolyRegression with d = '+str(d))
+    plt.title('Regularization Parameter $\lambda$ = 0',fontsize=22)
     plt.plot(xpoints, ypoints, 'b-')
-    plt.xlabel('X')
-    plt.ylabel('Y')
+    plt.xlabel('X',fontsize=22)
+    plt.ylabel('Y',fontsize=22)
+    plt.show()
+    
+    # tune the hyperparameter
+    lambda_list = np.array([0, 0.001, 0.003, 0.006, 0.01,
+                       0.03, 0.06, 0.1, 0.3, 0.6, 1, 3, 10])
+    model = PolynomialRegression(degree = d, regLambda = 0.0001,
+                tuneLambda = True, regLambdaValues = lambda_list)
+    model.fit(X, y)
+    
+    # output predictions
+    xpoints = pd.DataFrame(np.linspace(np.max(X), np.min(X), 100))
+    ypoints = model.predict(xpoints)
+
+    # plot curve
+    plt.figure(2,figsize=(16,9))
+    plt.plot(X, y, 'rx')
+    plt.title('Regularization Parameter $\lambda$ = '+str(model.regLambda)
+                ,fontsize=22)
+    plt.plot(xpoints, ypoints, 'b-')
+    plt.xlabel('X',fontsize=22)
+    plt.ylabel('Y',fontsize=22)
     plt.show()
 
 if __name__ == '__main__':
