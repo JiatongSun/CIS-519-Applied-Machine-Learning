@@ -24,10 +24,10 @@ class PolynomialRegression:
         self.regLambdaValues = regLambdaValues
         self.JHist = None
         self.theta = np.random.randn(degree+1).reshape(-1,1)
-#        self.alpha = 0.1
-#        self.thresh = 1E-2
         self.alpha = 0.25
         self.thresh = 1E-4
+        self.mean = np.zeros((degree,1))
+        self.std = np.zeros((degree,1))
 
 
     def polyfeatures(self, X, degree):
@@ -65,7 +65,7 @@ class PolynomialRegression:
                 You need to apply polynomial expansion and scaling first
         '''
         X = self.polyfeatures(X,self.degree)
-        X = self.standardize(X)
+        X = self.standardize_train(X)
         X = X.to_numpy()
         y = y.to_numpy()
         n = len(y)
@@ -73,7 +73,7 @@ class PolynomialRegression:
         
         if self.tuneLambda and self.regLambdaValues != []:
             model = Ridge()
-            grid = GridSearchCV(estimator = model,
+            grid = GridSearchCV(estimator = model,cv=3,
                                 param_grid = dict(alpha = self.regLambdaValues))
             grid.fit(X,y.reshape(-1,1))
             self.regLambda = grid.best_params_.get('alpha')
@@ -91,25 +91,37 @@ class PolynomialRegression:
             an n-by-1 data frame of the predictions
         '''
         X = self.polyfeatures(X,self.degree)
-        X = self.standardize(X)
+        X = self.standardize_test(X)
         X = X.to_numpy()
         n = X.shape[0]
         X = np.c_[np.ones((n,1)), X]     # Add a row of ones for the bias term
         
         return pd.DataFrame(np.dot(X,self.theta))
     
-    def standardize(self, X):
+    def standardize_train(self, X):
         '''
-        standardize the data before training or predicting
+        standardize the training data before training or predicting
         Arguments:
             X is a n-by-d data frame
         Returns:
             an n-by-d data frame of the predictions
         '''
         X = X.to_numpy()
-        mean_val = np.mean(X, axis=0)
-        std_val = np.std(X, axis=0)
-        standard = (X - mean_val) / std_val
+        self.mean = np.mean(X, axis=0)
+        self.std = np.std(X, axis=0)
+        standard = (X - self.mean) / self.std
+        return pd.DataFrame(standard)
+    
+    def standardize_test(self, X):
+        '''
+        standardize the test data before training or predicting
+        Arguments:
+            X is a n-by-d data frame
+        Returns:
+            an n-by-d data frame of the predictions
+        '''
+        X = X.to_numpy()
+        standard = (X - self.mean) / self.std
         return pd.DataFrame(standard)
     
     def computeCost(self, X, y, theta):
@@ -146,21 +158,45 @@ class PolynomialRegression:
         self.JHist = []
         iter_num = 0
         last_cost = 1E8
+        activate_strict = False
         while True:
             cost = self.computeCost(X, y, theta)
             self.JHist.append( (cost, theta) )
-            if iter_num > 0 and\
-                abs(cost - last_cost) < self.thresh:
-                    break
 #            if iter_num > 0 and\
-#                norm(theta - self.JHist[-2][-1]) < self.thresh:
+#                abs(cost - last_cost) < self.thresh:
+#                    print(cost)
+#                    break
+            if iter_num > 0 and\
+                np.linalg.norm(theta - self.JHist[-2][-1]) <= self.thresh:
 #                print("Iteration: ", iter_num+1, 
 #                  " \nCost: ", self.JHist[iter_num][0],
 #                  " \nTheta:\n ", theta)
-#                break
-            yhat = np.dot(X,theta)
-            theta = theta - np.dot(X.T, (yhat-y)) * (self.alpha / n)
-            theta[1:] = theta[1:] * (1 - self.alpha * self.regLambda)
+                print(cost)
+                break
+#            if iter_num >0:
+#                check_1 = np.linalg.norm(theta - self.JHist[-2][-1])
+#                check_2 = abs(cost - last_cost)
+#                if check_2 < self.thresh and activate_strict is not True:
+#                    if iter_num < 100:
+#                        activate_strict = True
+#                    else:
+#                        print(cost)
+#                        break
+#                if check_1 < self.thresh and activate_strict is True:
+#                    print(cost)
+#                    break
+#                    
+#            yhat = np.dot(X,theta)
+#            theta = theta - np.dot(X.T, (yhat-y)) * (self.alpha / n)
+#            theta[1:] = theta[1:] * (1 - self.alpha * self.regLambda)
+            
+            for i in range(theta.shape[0]):
+                yhat = np.dot(X,theta)
+                if i==0:
+                    theta[i] = theta[i]-np.dot(X[:,i], (yhat-y))*(self.alpha/n)
+                else:
+                    theta[i] = theta[i]*(1-self.alpha*self.regLambda)
+                    theta[i] = theta[i]-np.dot(X[:,i], (yhat-y))*(self.alpha/n)
             iter_num += 1
             last_cost = cost
         return theta
