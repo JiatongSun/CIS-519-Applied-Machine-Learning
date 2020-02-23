@@ -67,7 +67,7 @@ class LogisticRegression:
         if self.regNorm==2:
             grad_2 = regLambda*theta
         elif self.regNorm==1:
-            grad_2 = regLambda*np.sign(theta)/2
+            grad_2 = regLambda*np.sign(theta)
         else:
             raise ValueError('regNorm is not 1 or 2!')
         grad_2[0] = 0
@@ -99,7 +99,8 @@ class LogisticRegression:
         '''
         n,d = X.shape
         if self.initTheta is None:
-            self.initTheta = np.asmatrix(np.zeros((d+1,1)))
+            self.initTheta = np.zeros((d+1,1))
+        self.initTheta = np.asmatrix(self.initTheta)
         # initialize
         X = np.c_[np.ones((n,1)), X]
         theta = self.initTheta.copy()
@@ -107,7 +108,7 @@ class LogisticRegression:
         iter_num = 0
         # change data frame to numpy matrix
         X = np.asmatrix(X)
-        y = np.asmatrix(y)
+        y = np.asmatrix(y.to_numpy())
         y = y.reshape(-1,1)
         # gradient descent
         while True:
@@ -121,6 +122,7 @@ class LogisticRegression:
                 self.finalTheta = theta.copy()
                 break
             if iter_num > self.maxNumIters:
+                print(f'cost: {cost}')
                 print(f'Reach maximum iterations!')
                 self.finalTheta = theta.copy()
                 break
@@ -210,7 +212,7 @@ def test_logreg1():
     Xstandardized = pd.DataFrame(standardizer.fit_transform(X))  # compute mean and stdev on training set for standardization
     
     # train logistic regression
-    logregModel = LogisticRegression(regLambda = 0.00000001)
+#    logregModel = LogisticRegression(regLambda = 0.00000001)
 #    logregModel = LogisticRegression(regLambda = 0.001)
 #    logregModel = LogisticRegression(regLambda = 0.1)
 #    logregModel = LogisticRegression(regLambda = 1)
@@ -219,7 +221,7 @@ def test_logreg1():
 #    logregModel = LogisticRegression(regLambda = 0.001, regNorm=1)
 #    logregModel = LogisticRegression(regLambda = 0.1, regNorm=1)
 #    logregModel = LogisticRegression(regLambda = 1, regNorm=1)
-#    logregModel = LogisticRegression(regLambda = 10, regNorm=1)
+    logregModel = LogisticRegression(regLambda = 10, regNorm=1)
     logregModel.fit(Xstandardized,y)
     
     # Plot the decision boundary
@@ -243,7 +245,7 @@ def test_logreg1():
     plt.scatter(X[X.columns[0]], X[X.columns[1]], c=y.ravel(), edgecolors='k', cmap=plt.cm.Paired)
     
     # Configure the plot display
-    plt.title('L1 Regularization, $\lambda$ = 0.001',fontsize=22)
+    plt.title('L1 Regularization, $\lambda$ = 10',fontsize=22)
     plt.xlabel('Exam 1 Score',fontsize=22)
     plt.ylabel('Exam 2 Score',fontsize=22)
 
@@ -273,7 +275,6 @@ def test_logreg2():
     Xaug = mapFeature(X.copy(), X.columns[0], X.columns[1], polyPower)
 
     # # Standardize features
-    from sklearn.preprocessing import StandardScaler
     standardizer = StandardScaler()
     Xaug = pd.DataFrame(standardizer.fit_transform(Xaug))  # compute mean and stdev on training set for standardization
     

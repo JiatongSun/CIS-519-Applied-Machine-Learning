@@ -25,7 +25,7 @@ class LogisticRegressionAdagrad:
         self.epsilon = epsilon
         self.maxNumIters = maxNumIters
         self.initTheta = initTheta
-        self.finalTheta = None
+        self.theta = None
         self.cumulateGrad = None
     
 
@@ -63,9 +63,17 @@ class LogisticRegressionAdagrad:
         Returns:
             the gradient, an d-dimensional vector
         '''
-        zeta = 1E-10
+        zeta = 1E-7
         h = self.sigmoid(X*theta)
-        gk = X.T*(h-y)
+        gk_1 = X.T*(h-y)
+        if self.regNorm==2:
+            gk_2 = regLambda*theta
+        elif self.regNorm==1:
+            gk_2 = regLambda*np.sign(theta)
+        else:
+            raise ValueError('regNorm is not 1 or 2!')
+        gk_2[0] = 0
+        gk = gk_1 + gk_2
         self.cumulateGrad += np.multiply(gk,gk)
         grad = gk/(np.sqrt(self.cumulateGrad)+zeta)
         return grad
@@ -96,7 +104,8 @@ class LogisticRegressionAdagrad:
         '''
         n,d = X.shape
         if self.initTheta is None:
-            self.initTheta = np.asmatrix(np.zeros((d+1,1)))
+            self.initTheta = np.zeros((d+1,1))
+        self.initTheta = np.asmatrix(self.initTheta)
         # initialize
         X = np.c_[np.ones((n,1)), X]
         theta = self.initTheta.copy()
@@ -105,7 +114,7 @@ class LogisticRegressionAdagrad:
         self.cumulateGrad = np.asmatrix(np.zeros((d+1,1)))
         # change data frame to numpy matrix
         X = np.asmatrix(X)
-        y = np.asmatrix(y)
+        y = np.asmatrix(y.to_numpy())
         y = y.reshape(-1,1)
         # Stochastic Gradient Descent
         while True:
@@ -120,13 +129,16 @@ class LogisticRegressionAdagrad:
                 if self.hasConverged(theta,old_theta,self.epsilon):
                     print(f'cost: {cost}')
                     print(f'iteration: {iter_num}')
-                    self.finalTheta = theta.copy()
+                    self.theta = theta.copy()
                     return
                 if iter_num > self.maxNumIters:
+                    print(f'cost: {cost}')
                     print(f'Reach maximum iterations!')
+                    self.theta = theta.copy()
                     return
                 old_theta = theta.copy()
-                iter_num += 1
+            iter_num += 1
+                
 
 
     def predict(self, X):
@@ -156,7 +168,7 @@ class LogisticRegressionAdagrad:
         n,_ = X.shape
         X = np.c_[np.ones((n,1)), X]
         X = np.asmatrix(X)
-        return pd.DataFrame(self.sigmoid(X*self.finalTheta))
+        return pd.DataFrame(self.sigmoid(X*self.theta))
 
 
 
@@ -206,7 +218,7 @@ def test_logreg1():
     Xstandardized = pd.DataFrame(standardizer.fit_transform(X))  # compute mean and stdev on training set for standardization
     
     # train logistic regression
-    logregModel = LogisticRegressionAdagrad(regLambda = 0.00000001)
+    logregModel = LogisticRegressionAdagrad(regLambda = 0.00000001, regNorm = 1)
     logregModel.fit(Xstandardized,y)
     
     # Plot the decision boundary
@@ -230,7 +242,7 @@ def test_logreg1():
     plt.scatter(X[X.columns[0]], X[X.columns[1]], c=y.ravel(), edgecolors='k', cmap=plt.cm.Paired)
     
     # Configure the plot display
-    plt.title('L1 Regularization, $\lambda$ = 0.001',fontsize=22)
+    plt.title('L2 Regularization, $\lambda$ = 0',fontsize=22)
     plt.xlabel('Exam 1 Score',fontsize=22)
     plt.ylabel('Exam 2 Score',fontsize=22)
 
@@ -240,6 +252,69 @@ def test_logreg1():
     plt.yticks(())
     
     plt.show()
+    
+def test_logreg2():
+
+    polyPower = 6
+
+    # load the data
+    filepath = "http://www.seas.upenn.edu/~cis519/spring2020/data/hw3-data2.csv"
+    df = pd.read_csv(filepath, header=None)
+
+    X = df[df.columns[0:2]]
+    y = df[df.columns[2]]
+
+    n,d = X.shape
+
+    # map features into a higher dimensional feature space
+    Xaug = mapFeature(X.copy(), X.columns[0], X.columns[1], polyPower)
+
+    # # Standardize features
+    standardizer = StandardScaler()
+    Xaug = pd.DataFrame(standardizer.fit_transform(Xaug))  # compute mean and stdev on training set for standardization
+    
+    # train logistic regression
+    logregModel = LogisticRegressionAdagrad(regLambda = 0.00000001, regNorm=2)
+    logregModel.fit(Xaug,y)
+    
+    # Plot the decision boundary
+    h = .02  # step size in the mesh
+    x_min = X[X.columns[0]].min() - .5
+    x_max = X[X.columns[0]].max() + .5
+    y_min = X[X.columns[1]].min() - .5
+    y_max = X[X.columns[1]].max() + .5
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+
+    allPoints = pd.DataFrame(np.c_[xx.ravel(), yy.ravel()])
+    allPoints = mapFeature(allPoints, allPoints.columns[0], allPoints.columns[1], polyPower)
+    allPoints = pd.DataFrame(standardizer.transform(allPoints))
+    Xaug = pd.DataFrame(standardizer.fit_transform(Xaug))  # standardize data
+    
+    Z = logregModel.predict(allPoints)
+    Z = np.asmatrix(Z.to_numpy())
+
+    # Put the result into a color plot
+    Z = Z.reshape(xx.shape)
+    plt.figure(1, figsize=(8, 6))
+    plt.contourf(xx, yy, Z, cmap=plt.cm.Paired)
+
+    # Plot the training points
+    plt.scatter(X[X.columns[0]], X[X.columns[1]], c=y.ravel(), edgecolors='k', cmap=plt.cm.Paired)
+    
+    # Configure the plot display
+    plt.xlabel('Microchip Test 1')
+    plt.ylabel('Microchip Test 2')
+
+    plt.xlim(xx.min(), xx.max())
+    plt.ylim(yy.min(), yy.max())
+    plt.xticks(())
+    plt.yticks(())
+    
+    plt.show()
+
+
+    print(str(Z.min()) + " " + str(Z.max()))
 
 if __name__ == '__main__':
-    test_logreg1()
+#    test_logreg1()
+    test_logreg2()
