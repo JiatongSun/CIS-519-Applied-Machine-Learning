@@ -291,17 +291,20 @@ class LogisticRegressionAdagrad:
                 cur_X, cur_y = X[instance], y[instance]
                 grad = self.computeGradient(theta, cur_X, cur_y, self.regLambda)
                 theta -= self.alpha*grad
-                if self.hasConverged(theta,old_theta,self.epsilon):
-                    print(f'cost: {cost}')
-                    print(f'iteration: {iter_num}')
-                    self.theta = theta.copy()
-                    return
+                
                 if iter_num > self.maxNumIters:
                     print(f'cost: {cost}')
                     print(f'Reach maximum iterations!')
                     self.theta = theta.copy()
                     return
-                old_theta = theta.copy()
+                
+            if self.hasConverged(theta,old_theta,self.epsilon):
+                    print(f'cost: {cost}')
+                    print(f'iteration: {iter_num}')
+                    self.theta = theta.copy()
+                    return
+            old_theta = theta.copy()
+            print(cost)
             iter_num += 1
                 
 

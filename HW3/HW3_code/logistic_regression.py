@@ -72,7 +72,7 @@ class LogisticRegression:
             raise ValueError('regNorm is not 1 or 2!')
         grad_2[0] = 0
         grad = grad_1 + grad_2 # grad is a d-by-1 numpy matrix
-        return grad
+        return grad.astype(float)
     
     def hasConverged(self, new_theta, old_theta, epsilon):
         '''
@@ -107,8 +107,8 @@ class LogisticRegression:
         old_theta = self.initTheta.copy()
         iter_num = 0
         # change data frame to numpy matrix
-        X = np.asmatrix(X)
-        y = np.asmatrix(y.to_numpy())
+        X = np.asmatrix(X).astype(np.float)
+        y = np.asmatrix(y.to_numpy()).astype(np.float)
         y = y.reshape(-1,1)
         # gradient descent
         while True:
@@ -212,7 +212,7 @@ def test_logreg1():
     Xstandardized = pd.DataFrame(standardizer.fit_transform(X))  # compute mean and stdev on training set for standardization
     
     # train logistic regression
-#    logregModel = LogisticRegression(regLambda = 0.00000001)
+    logregModel = LogisticRegression(regLambda = 0.00000001)
 #    logregModel = LogisticRegression(regLambda = 0.001)
 #    logregModel = LogisticRegression(regLambda = 0.1)
 #    logregModel = LogisticRegression(regLambda = 1)
@@ -221,7 +221,7 @@ def test_logreg1():
 #    logregModel = LogisticRegression(regLambda = 0.001, regNorm=1)
 #    logregModel = LogisticRegression(regLambda = 0.1, regNorm=1)
 #    logregModel = LogisticRegression(regLambda = 1, regNorm=1)
-    logregModel = LogisticRegression(regLambda = 10, regNorm=1)
+#    logregModel = LogisticRegression(regLambda = 10, regNorm=1)
     logregModel.fit(Xstandardized,y)
     
     # Plot the decision boundary
@@ -323,5 +323,5 @@ def test_logreg2():
 
 
 if __name__ == '__main__':
-    test_logreg1()
-#    test_logreg2()
+#    test_logreg1()
+    test_logreg2()

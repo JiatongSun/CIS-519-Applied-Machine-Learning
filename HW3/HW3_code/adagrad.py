@@ -113,8 +113,8 @@ class LogisticRegressionAdagrad:
         iter_num = 0
         self.cumulateGrad = np.asmatrix(np.zeros((d+1,1)))
         # change data frame to numpy matrix
-        X = np.asmatrix(X)
-        y = np.asmatrix(y.to_numpy())
+        X = np.asmatrix(X).astype(np.float)
+        y = np.asmatrix(y.to_numpy()).astype(np.float)
         y = y.reshape(-1,1)
         # Stochastic Gradient Descent
         while True:
@@ -126,17 +126,19 @@ class LogisticRegressionAdagrad:
                 cur_X, cur_y = X[instance], y[instance]
                 grad = self.computeGradient(theta, cur_X, cur_y, self.regLambda)
                 theta -= self.alpha*grad
-                if self.hasConverged(theta,old_theta,self.epsilon):
-                    print(f'cost: {cost}')
-                    print(f'iteration: {iter_num}')
-                    self.theta = theta.copy()
-                    return
+                
                 if iter_num > self.maxNumIters:
                     print(f'cost: {cost}')
                     print(f'Reach maximum iterations!')
                     self.theta = theta.copy()
                     return
-                old_theta = theta.copy()
+                
+            if self.hasConverged(theta,old_theta,self.epsilon):
+                    print(f'cost: {cost}')
+                    print(f'iteration: {iter_num}')
+                    self.theta = theta.copy()
+                    return
+            old_theta = theta.copy()
             iter_num += 1
                 
 
@@ -169,7 +171,6 @@ class LogisticRegressionAdagrad:
         X = np.c_[np.ones((n,1)), X]
         X = np.asmatrix(X)
         return pd.DataFrame(self.sigmoid(X*self.theta))
-
 
 
     def sigmoid(self, Z):
@@ -218,7 +219,7 @@ def test_logreg1():
     Xstandardized = pd.DataFrame(standardizer.fit_transform(X))  # compute mean and stdev on training set for standardization
     
     # train logistic regression
-    logregModel = LogisticRegressionAdagrad(regLambda = 0.00000001, regNorm = 1)
+    logregModel = LogisticRegressionAdagrad(regLambda = 0, regNorm = 2)
     logregModel.fit(Xstandardized,y)
     
     # Plot the decision boundary
