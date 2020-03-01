@@ -1,0 +1,121 @@
+\documentclass{article}
+\usepackage[letterpaper]{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{amssymb}
+
+\title{CIS 419/519: Homework 4}
+\author{Jiatong Sun}
+\date{02/29/2020}
+
+\begin{document}
+    \maketitle
+    Although the solutions are entirely my own, I consulted with the following people and sources while working on this homework:\\
+$https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols$\\
+$https://tex.stackexchange.com/questions/122778/left-brace-including-several-lines-in-eqnarray$
+    
+    \section{Fitting an SVM by Hand}
+        \begin{enumerate}[label=\alph*.]
+            \item % a
+            As is given in the problem:
+            \begin{equation}
+            	x1=0,\quad x2=\sqrt{2}
+            \end{equation}
+            and
+            \begin{equation}
+            	\phi(x)=[1,\sqrt{2},x^2]^T
+            \end{equation}
+            We know that
+            \begin{equation}
+            	\phi(x_1)=[1,0,0]^T
+            	\quad
+            	\phi(x_2)=[1,2,2]^T
+            \end{equation}
+            Since the optimal vector $\boldsymbol{w}$ is orthogonal to the dicision to the decision boundary, it is parallel to the vector connecting $\phi(x_1)$ and $\phi(x_2)$.\\\\
+            Since
+            \begin{equation}
+            	\phi(x_2)-\phi(x_1)=
+            	[1,2,2]^T-[1,0,0]^T=
+            	[0,2,2]^T
+            \end{equation}
+            So $[0,2,2]^T$ is a vector that is parallel to the optimal vector $\boldsymbol{w}$.
+            
+            \item % b
+            The margin is the distance between the two points in the 3D space.
+            \begin{equation}
+            	margin = ||\phi(x_2)-\phi(x_1)||
+            	=\sqrt{(1-1)^2+(2-0)^2+(2-0)^2}
+            	=2\sqrt{2}
+            \end{equation}
+            
+            \item % c
+            From the result of a, we can assume that
+            \begin{equation}
+            	\boldsymbol{w} = [0,2t,2t]^T
+            \end{equation}
+            So
+            \begin{equation}
+            	||\boldsymbol{w}||
+            	=\sqrt{0^2+(2t)^2+(2t)^t}
+            	=\sqrt{8t^2}=2\sqrt{2}t
+            \end{equation}
+            According to the relationship between $||w||$ and the length of the margin, we know that
+            \begin{equation}
+            	d=\frac{2}{||w||}
+            	=\frac{1}{\sqrt{2}t}=2\sqrt{2}
+            \end{equation}
+            or
+            \begin{equation}
+            	t=\frac{1}{4}
+            \end{equation}
+            So
+            \begin{equation}
+            	\boldsymbol{w}
+            	=[0,\frac{1}{2},\frac{1}{2}]^T
+            \end{equation}
+            
+            \item % d
+            According to SVM requirement,
+            \begin{equation}
+            	\begin{cases}
+               		y_1(\boldsymbol{w}^T\phi(x_1)+w_0)
+            		\geqslant 1\\
+               		y_2(\boldsymbol{w}^T\phi(x_2)+w_0)
+            		\geqslant 1
+            	\end{cases}
+            \end{equation}
+            or
+            \begin{equation}
+            	\begin{cases}
+               		-1\times(0+w_0)
+            		\geqslant 1\\
+               		1\times(2+w_0)
+            		\geqslant 1
+            	\end{cases}
+            \end{equation}
+            \begin{equation}
+            	-1 \leqslant w_0 \leqslant -1
+            \end{equation}
+            So
+            \begin{equation}
+            	w_0 = -1
+            \end{equation}
+            
+            \item % e
+            \begin{equation}
+            	h(x)=\boldsymbol{w}^T\phi(x)+w_0
+            	=\frac{x^2}{2}+\frac{\sqrt{2}x}{2}-1
+            \end{equation}
+        \end{enumerate}    
+        
+        \section{Support Vector}
+        There are two possibilies:\\\\
+        1. Size of maximum margin increases, if a support vector determining the shortest margin is removed.\\\\
+        2. Size of maximum margin stays the same, if the removed vector is not the one determining the shortest margin.
+       
+\end{document}
