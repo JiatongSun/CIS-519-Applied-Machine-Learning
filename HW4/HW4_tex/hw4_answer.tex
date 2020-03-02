@@ -8,6 +8,7 @@
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{amssymb}
+\usepackage{tabularx}
 
 \title{CIS 419/519: Homework 4}
 \author{Jiatong Sun}
@@ -15,9 +16,11 @@
 
 \begin{document}
     \maketitle
-    Although the solutions are entirely my own, I consulted with the following people and sources while working on this homework:\\
+    Although the solutions are entirely my own, I consulted with the following people and sources while working on this homework: $Jing$ $Zhao$\\
 $https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols$\\
-$https://tex.stackexchange.com/questions/122778/left-brace-including-several-lines-in-eqnarray$
+$https://tex.stackexchange.com/questions/122778/left-brace-including-several-lines-in-eqnarray$\\
+$https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html$\\
+$https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html$
     
     \section{Fitting an SVM by Hand}
         \begin{enumerate}[label=\alph*.]
@@ -117,5 +120,42 @@ $https://tex.stackexchange.com/questions/122778/left-brace-including-several-lin
         There are two possibilies:\\\\
         1. Size of maximum margin increases, if a support vector determining the shortest margin is removed.\\\\
         2. Size of maximum margin stays the same, if the removed vector is not the one determining the shortest margin.
+        
+        \section{Challenge: Generalizing to Unseen Data}
+        \textbf{Preprocessing}\\\\
+        1. Sort the data in $X$ and $y$ in ascending direction and eliminate rows whose id only appears in $X$ or $y$. After this operation, $X$ and $y$ are aligned by an ascending id number.\\\\
+        2. Drop useless features. I dropped the features below: ['id', 'Date of entry', 'Country funded by', 'oompa loomper', 'Region code', 'District code', 'Chocolate consumers in town', 'Does factory offer tours', 'Recorded by','Oompa loompa management', 'Payment scheme', 'management group'].\\\\
+        3. Drop columns whose missing ratio is higher than 50\%.\\\\
+        4. Define categorical features (even though some features look like numerical features, if they are defined as categorical in the pdf, they need to be converted to object dtypes).\\\\
+        5. Fill missing data (mean for numerical and mode for categorical). Use OHE to process the categorical data.\\\\
+        6. Drop the id column of label.\\\\
+        7. For unlabeled data set, after step (2)-(5), we still need to add missing features and reduce redundant features with respect to the training data set or otherwise the data cannot be predicted.\\\\
+        
+        \noindent 
+        \textbf{The Best Classifier}\\\\
+        The best classifier I found is the Support Vector Machine (SVM). Before training the model, I standardized the training data set, which turns out to be a great way of increasing the accuracy. All the parameters are set as default in according to skicit. 
+        
+        \noindent
+        \textbf{Results and Discussion}\\\\
+        \begin{center}
+		\begin{tabularx}{0.8\textwidth} { 
+ 			| >{\centering\arraybackslash}X 
+  			| >{\centering\arraybackslash}X 
+   			| >{\centering\arraybackslash}X | }
+   			\hline
+   			\multicolumn{3}{|c|}
+   			{\textbf{Algorithms Comparison}}\\
+ 			\hline
+ 			& training accuracy & generalized accuracy \\
+ 			\hline
+ 			Boosted Decision Tree & 0.7186 & 0.7143\\
+ 			\hline
+ 			Support Vector Machine & 0.7628 & 0.7429\\
+ 			\hline
+ 			Logistic Regression & 0.7196 & 0.7189\\
+ 			\hline
+		\end{tabularx}  
+		\end{center} 
+		According to the result table, we can notice the support vector machine generates a better performance than the other two algorithms. But this result is also based on the fact that during the training process, SVM took much more time than the other two, so we can simply arrive at the conclusion that in this scenario, SVM generates a more complicated model. The boosted Decision Tree and Logistic Regression may have perfomance gain if we tune the parameters and make the model a bit more complex, such as increasing the maximum iteration number or maximum tree depth for BoostedDT.
        
 \end{document}
