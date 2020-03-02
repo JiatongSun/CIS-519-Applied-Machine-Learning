@@ -148,7 +148,7 @@ $https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Logistic
  			\hline
  			& training accuracy & generalized accuracy \\
  			\hline
- 			Boosted Decision Tree & 0.7186 & 0.7143\\
+ 			Boosted Decision Tree & 0.9999 & 0.7742\\
  			\hline
  			Support Vector Machine & 0.7628 & 0.7429\\
  			\hline
@@ -156,6 +156,6 @@ $https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Logistic
  			\hline
 		\end{tabularx}  
 		\end{center} 
-		According to the result table, we can notice the support vector machine generates a better performance than the other two algorithms. But this result is also based on the fact that during the training process, SVM took much more time than the other two, so we can simply arrive at the conclusion that in this scenario, SVM generates a more complicated model. The boosted Decision Tree and Logistic Regression may have perfomance gain if we tune the parameters and make the model a bit more complex, such as increasing the maximum iteration number or maximum tree depth for BoostedDT.
+		According to the result table, we can notice that the Boosted Decision Tree has the best performance among all three. Its training accuracy is extremely high, but its generalized accuracy is not that high. This may be because of overfitting to some extent, but its generalized ability is still the best with respect to unseen data set, which is an advantage of the Boosted Dicision Tree. Also, During the test, the SVM works particularly slow, which demonstrates its slow converge speed. The Logistic Regression is quick but its performance is not brilliant.
        
 \end{document}

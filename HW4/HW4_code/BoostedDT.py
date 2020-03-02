@@ -149,6 +149,7 @@ def train_chocolate():
                        'Does factory offer tours', 'Recorded by',
                        'Oompa loompa management', 'Payment scheme',
                        'management_group']
+#    useless_feature = ['id', 'Date of entry', 'Recorded by']
     X = X.drop(useless_feature,axis=1)
     
     X = dropMissingColumn(X, 0.5)
@@ -157,6 +158,15 @@ def train_chocolate():
                            'chocolate_source_class', 'Cocoa farm',
                            'Official or Unofficial pipe', 
                            'Type of pump','management']
+#    categorical_feature = ['chocolate_quality', 'chocolate_quantity',
+#                           'pipe_type', 'chocolate_source',
+#                           'Official or Unofficial pipe',
+#                           'chocolate_source_class', 'Cocoa farm',
+#                           'Type of pump','management', 'Country funded by',
+#                           'Region code', 'District code', 'management_group',
+#                           'Oompa loompa management', 'Payment scheme',]
+    
+    
     Xc = X[categorical_feature]
     Xn = X.drop(categorical_feature,axis=1)
     
@@ -187,34 +197,46 @@ def train_chocolate():
     X_test = test.drop(['label'], axis=1)
     y_test = test['label']
     
-    # tuning the best numBoostingIters and maxTreeDepth
-    max_train_accuracy = 0
-    max_test_accuracy = 0
-    max_train_iter = 0
-    max_test_iter = 0
-    for iter_num in range(25):
-        modelBoostedDT = BoostedDT(numBoostingIters=iter_num, maxTreeDepth=4)
-        modelBoostedDT.fit(X_train,y_train)
-        train_accuracy = (modelBoostedDT.predict(X_train).values.reshape(-1)
-                    ==y_train.values).sum()/len(y_train)
-        test_accuracy = (modelBoostedDT.predict(X_test).values.reshape(-1)
-                    ==y_test.values).sum()/len(y_test)
-        print(f'iteration: {iter_num}')
-        print(f'train: {train_accuracy}')
-        print(f'test: {test_accuracy}\n')
-        if train_accuracy > max_train_accuracy:
-            max_train_accuracy = train_accuracy
-            max_train_iter = iter_num
-        if test_accuracy > max_test_accuracy:
-            max_test_accuracy = test_accuracy
-            max_test_iter = iter_num
-    print(f'max train performance: {max_train_accuracy}; iteration: {max_train_iter}')
-    print(f'max test performance: {max_test_accuracy}; iteration: {max_test_iter}')
-    modelBoostedDT = BoostedDT(numBoostingIters=max_test_iter, maxTreeDepth=4)
+# =============================================================================
+#     # tuning the best numBoostingIters and maxTreeDepth
+#     max_train_accuracy = 0
+#     max_test_accuracy = 0
+#     max_train_iter = 0
+#     max_test_iter = 0
+#     max_train_depth = 0
+#     max_test_depth = 0
+#     for iter_num in range(100, 200, 10):
+#         for depth in range(18,19):
+#             modelBoostedDT = BoostedDT(numBoostingIters=iter_num, maxTreeDepth=depth)
+#             modelBoostedDT.fit(X_train,y_train)
+#             train_accuracy = (modelBoostedDT.predict(X_train).values.reshape(-1)
+#                         ==y_train.values).sum()/len(y_train)
+#             test_accuracy = (modelBoostedDT.predict(X_test).values.reshape(-1)
+#                         ==y_test.values).sum()/len(y_test)
+#             print(f'iteration: {iter_num}')
+#             print(f'depth: {depth}')
+#             print(f'train: {train_accuracy}')
+#             print(f'test: {test_accuracy}\n')
+#             if train_accuracy > max_train_accuracy:
+#                 max_train_accuracy = train_accuracy
+#                 max_train_iter = iter_num
+#                 max_train_depth = depth
+#             if test_accuracy > max_test_accuracy:
+#                 max_test_accuracy = test_accuracy
+#                 max_test_iter = iter_num
+#                 max_test_depth = depth
+#     print(f'best train performance: {max_train_accuracy}')
+#     print(f'    iteration: {max_train_iter}')
+#     print(f'    depth: {max_train_depth}')
+#     print(f'best test performance: {max_test_accuracy}')
+#     print(f'    iteration: {max_test_iter}')
+#     print(f'    depth: {max_test_depth}')
+#     modelBoostedDT = BoostedDT(numBoostingIters=max_test_iter, maxTreeDepth=max_test_depth)
+# =============================================================================
 
 
     # Boosted Decision Tree
-    modelBoostedDT = BoostedDT(numBoostingIters=20, maxTreeDepth=4)
+    modelBoostedDT = BoostedDT(numBoostingIters=28, maxTreeDepth=18)
     modelBoostedDT.fit(X_train,y_train)
     train_accuracy_boostedDT = (modelBoostedDT.predict(X_train).values.reshape(-1)
                      ==y_train.values).sum()/len(y_train)
@@ -222,7 +244,6 @@ def train_chocolate():
                      ==y_test.values).sum()/len(y_test)
     print(f'train_accuracy_boostedDT: {train_accuracy_boostedDT}')
     print(f'test_accuracy_boostedDT: {test_accuracy_boostedDT}')
-    
     
     modelBoostedDT.fit(X,y)
     
@@ -237,70 +258,76 @@ def train_chocolate():
     output_leader_boost.to_csv('predictions-leaderboard-BoostedDT.csv',index=False)
 
 
-    # Preprocessing for SVM and Logistic Regression
-    X = X.to_numpy()
-    y = y.to_numpy().flatten()
+# =============================================================================
+#     # Preprocessing for SVM and Logistic Regression
+#     X = X.to_numpy()
+#     y = y.to_numpy().flatten()
+#     
+#     X_train = X_train.to_numpy()
+#     y_train = y_train.to_numpy().flatten()
+#     X_test = X_test.to_numpy()
+#     y_test = y_test.to_numpy().flatten()
+#     
+#     X_grade = X_grade.to_numpy()
+#     X_leader = X_leader.to_numpy()
+#     
+#     standardizer = StandardScaler()
+#     Xstandardized = pd.DataFrame(standardizer.fit_transform(X))
+#     Xstandardized_train = pd.DataFrame(standardizer.fit_transform(X_train))
+#     Xstandardized_test = pd.DataFrame(standardizer.fit_transform(X_test))
+#     Xstandardized_grade = pd.DataFrame(standardizer.fit_transform(X_grade))
+#     Xstandardized_leader = pd.DataFrame(standardizer.fit_transform(X_leader))
+# =============================================================================
     
-    X_train = X_train.to_numpy()
-    y_train = y_train.to_numpy().flatten()
-    X_test = X_test.to_numpy()
-    y_test = y_test.to_numpy().flatten()
+# =============================================================================
+#     # SVM
+#     svm_clf = SVC(gamma='auto')
+#     svm_clf.fit(Xstandardized_train, y_train)
+#     train_accuracy_svm = (svm_clf.predict(Xstandardized_train)
+#                             ==y_train).sum()/len(y_train)
+#     test_accuracy_svm = (svm_clf.predict(Xstandardized_test)
+#                             ==y_test).sum()/len(y_test)
+#     print(f'train_accuracy_svm: {train_accuracy_svm}')
+#     print(f'test_accuracy_svm: {test_accuracy_svm}')
+#     
+#     svm_clf.fit(Xstandardized, y)
+#     
+#     y_grade_svm = pd.DataFrame(svm_clf.predict(Xstandardized_grade))
+#     output_grade_svm = pd.concat([X_grade_id, y_grade_svm], axis=1)
+#     output_grade_svm.columns = ['id', 'label']
+#     output_grade_svm.to_csv('predictions-grading-SVC.csv',index=False)
+#     
+#     y_leader_svm = pd.DataFrame(svm_clf.predict(Xstandardized_leader))
+#     output_leader_svm = pd.concat([X_leader_id, y_leader_svm], axis=1)
+#     output_leader_svm.columns = ['id', 'label']
+#     output_leader_svm.to_csv('predictions-leaderboard-SVC.csv',index=False)
+# =============================================================================
     
-    X_grade = X_grade.to_numpy()
-    X_leader = X_leader.to_numpy()
-    
-    standardizer = StandardScaler()
-    Xstandardized = pd.DataFrame(standardizer.fit_transform(X))
-    Xstandardized_train = pd.DataFrame(standardizer.fit_transform(X_train))
-    Xstandardized_test = pd.DataFrame(standardizer.fit_transform(X_test))
-    Xstandardized_grade = pd.DataFrame(standardizer.fit_transform(X_grade))
-    Xstandardized_leader = pd.DataFrame(standardizer.fit_transform(X_leader))
-    
-    # SVM
-    svm_clf = SVC(gamma='auto')
-    svm_clf.fit(Xstandardized_train, y_train)
-    train_accuracy_svm = (svm_clf.predict(Xstandardized_train)
-                            ==y_train).sum()/len(y_train)
-    test_accuracy_svm = (svm_clf.predict(Xstandardized_test)
-                            ==y_test).sum()/len(y_test)
-    print(f'train_accuracy_svm: {train_accuracy_svm}')
-    print(f'test_accuracy_svm: {test_accuracy_svm}')
-    
-    svm_clf.fit(Xstandardized, y)
-    
-    y_grade_svm = pd.DataFrame(svm_clf.predict(Xstandardized_grade))
-    output_grade_svm = pd.concat([X_grade_id, y_grade_svm], axis=1)
-    output_grade_svm.columns = ['id', 'label']
-    output_grade_svm.to_csv('predictions-grading-SVC.csv',index=False)
-    
-    y_leader_svm = pd.DataFrame(svm_clf.predict(Xstandardized_leader))
-    output_leader_svm = pd.concat([X_leader_id, y_leader_svm], axis=1)
-    output_leader_svm.columns = ['id', 'label']
-    output_leader_svm.to_csv('predictions-leaderboard-SVC.csv',index=False)
-    
-    # Logistic Regression
-    logistic_clf = LogisticRegression(random_state=42,max_iter=120)
-    logistic_clf.fit(Xstandardized_train, y_train)
-    train_accuracy_logistic = (logistic_clf.predict(Xstandardized_train)
-                                    ==y_train).sum()/len(y_train)
-    test_accuracy_logistic = (logistic_clf.predict(Xstandardized_test)
-                                    ==y_test).sum()/len(y_test)
-    print(f'train_accuracy_logistic: {train_accuracy_logistic}')
-    print(f'test_accuracy_logistic: {test_accuracy_logistic}')
-    
-    logistic_clf.fit(Xstandardized, y)
-    
-    y_grade_logistic = pd.DataFrame(logistic_clf.predict(Xstandardized_grade))
-    output_grade_logistic = pd.concat([X_grade_id, y_grade_logistic], axis=1)
-    output_grade_logistic.columns = ['id', 'label']
-    output_grade_logistic.to_csv('predictions-grading-best.csv',index=False)
-    
-    y_leader_logistic = pd.DataFrame(logistic_clf.predict(Xstandardized_leader))
-    output_leader_logistic = pd.concat([X_leader_id, y_leader_logistic], axis=1)
-    output_leader_logistic.columns = ['id', 'label']
-    output_leader_logistic.to_csv('predictions-leaderboard-best.csv',index=False)
+# =============================================================================
+#     # Logistic Regression
+#     logistic_clf = LogisticRegression(random_state=42,max_iter=120)
+#     logistic_clf.fit(Xstandardized_train, y_train)
+#     train_accuracy_logistic = (logistic_clf.predict(Xstandardized_train)
+#                                     ==y_train).sum()/len(y_train)
+#     test_accuracy_logistic = (logistic_clf.predict(Xstandardized_test)
+#                                     ==y_test).sum()/len(y_test)
+#     print(f'train_accuracy_logistic: {train_accuracy_logistic}')
+#     print(f'test_accuracy_logistic: {test_accuracy_logistic}')
+#     
+#     logistic_clf.fit(Xstandardized, y)
+#     
+#     y_grade_logistic = pd.DataFrame(logistic_clf.predict(Xstandardized_grade))
+#     output_grade_logistic = pd.concat([X_grade_id, y_grade_logistic], axis=1)
+#     output_grade_logistic.columns = ['id', 'label']
+#     output_grade_logistic.to_csv('predictions-grading-logistic.csv',index=False)
+#     
+#     y_leader_logistic = pd.DataFrame(logistic_clf.predict(Xstandardized_leader))
+#     output_leader_logistic = pd.concat([X_leader_id, y_leader_logistic], axis=1)
+#     output_leader_logistic.columns = ['id', 'label']
+#     output_leader_logistic.to_csv('predictions-leaderboard-logistic.csv',index=False)
+# =============================================================================
     
     
 if __name__ == '__main__':
-    test_boostedDT()
-#    train_chocolate()
+#    test_boostedDT()
+    train_chocolate()

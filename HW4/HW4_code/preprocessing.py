@@ -127,7 +127,7 @@ def filterUnlabel(X_train,X_unlabel):
     lack_columns = np.setdiff1d(train_columns, unlabel_columns)
     redundancy_columns = np.setdiff1d(unlabel_columns, train_columns)
     X_unlabel = X_unlabel.assign(**dict.fromkeys(lack_columns,0))
-    X_unlabel.drop(redundancy_columns,axis=1)
+    X_unlabel = X_unlabel.drop(redundancy_columns,axis=1)
     return X_unlabel
     
     
