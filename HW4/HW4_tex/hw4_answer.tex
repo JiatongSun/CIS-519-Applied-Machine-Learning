@@ -133,7 +133,7 @@ $https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Logistic
         
         \noindent 
         \textbf{The Best Classifier}\\\\
-        The best classifier I found is the Support Vector Machine (SVM). Before training the model, I standardized the training data set, which turns out to be a great way of increasing the accuracy. All the parameters are set as default in according to skicit. 
+        The best classifier I found is the Random Forest. The n\_estimators parameter is set to 500, which represents the number of trees in the forest. The max\_depth parameter is set to 20.
         
         \noindent
         \textbf{Results and Discussion}\\\\
@@ -148,14 +148,19 @@ $https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Logistic
  			\hline
  			& training accuracy & generalized accuracy \\
  			\hline
- 			Boosted Decision Tree & 0.9999 & 0.7742\\
+ 			Boosted Decision Tree & 0.8801 & 0.7742\\
  			\hline
  			Support Vector Machine & 0.7628 & 0.7429\\
  			\hline
  			Logistic Regression & 0.7196 & 0.7189\\
  			\hline
+ 			Random Forest & 0.8664 & 0.7867\\
+ 			\hline
 		\end{tabularx}  
 		\end{center} 
-		According to the result table, we can notice that the Boosted Decision Tree has the best performance among all three. Its training accuracy is extremely high, but its generalized accuracy is not that high. This may be because of overfitting to some extent, but its generalized ability is still the best with respect to unseen data set, which is an advantage of the Boosted Dicision Tree. Also, During the test, the SVM works particularly slow, which demonstrates its slow converge speed. The Logistic Regression is quick but its performance is not brilliant.
+		According to the result table, we can notice that the Random Forest has the best performance among all four machine learning models. Also, its training process is extremely quick, so we can say that the Random Forest has a strong ability for unseen data generalization.\\\\
+		For the Boosted Decision Tree, its training accuracy is much higher than its generalized accuracy, though the latter one is also not bad. This may be because of overfitting to some extent, but since its generalized ability is still good enough, we can have the conclusion that the Boosted Decision Tree also has a good performance on generalizing for unseen data. \\\\
+		For the SVM, it works particularly slow during the training process, though the accuracy is still acceptable.\\\\
+		 The Logistic Regression works really quick but its performance is not good, which may be because the model is not complicated enough.
        
 \end{document}
