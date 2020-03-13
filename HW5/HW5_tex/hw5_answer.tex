@@ -21,7 +21,8 @@
 \begin{document}
     \maketitle
     \noindent
-    Although the solutions are entirely my own, I consulted with the following people and sources while working on this homework: 
+    Although the solutions are entirely my own, I consulted with the following people and sources while working on this homework: \\
+    https://stackoverflow.com/questions/50994504/how-to-put-figure-between-items-on-enumerate-list
     
     \section{Logical Functions with Neural Nets}
         \begin{enumerate}[label=\alph*.]
@@ -34,9 +35,104 @@
                 	\caption{NAND}      
         		\end{minipage} 
         		
-        		           
+        		
+        		\begin{table}[h]
+        			\centering
+					\begin{tabularx}{0.8\textwidth} { 
+ 						| >{\centering\arraybackslash}X 
+  						| >{\centering\arraybackslash}X 
+   						| >{\centering\arraybackslash}X | }
+   						\hline
+   						\multicolumn{3}{|c|}
+   						{\textbf{Truth Table}}\\
+ 						\hline
+ 					 	$x_1$ & $x_2$ & $H(x)$ \\
+ 						\hline
+ 						0 & 0 & $\sigma(30)=1$\\
+ 						\hline
+ 						0 & 1 & $\sigma(10)=1$\\
+ 						\hline
+ 						1 & 0 & $\sigma(10)=1$\\
+ 						\hline
+ 						1 & 1 & $\sigma(-10)=0$\\
+						\hline
+					\end{tabularx} 
+					\caption{NAND}
+					\label{tab:1}
+				\end{table}	        		           
             
             \item % b
+            	\begin{minipage}[t]{\linewidth}
+                	\captionsetup{type=figure}
+                	\centering
+                	\includegraphics[width=0.6\linewidth]
+                					{images/Q1b.jpg}
+                	\caption{NAND}      
+        		\end{minipage} 
+        		
+        		
+        		\begin{table}[h]
+        			\centering
+					\begin{tabularx}{0.8\textwidth} { 
+ 						| >{\centering\arraybackslash}X 
+  						| >{\centering\arraybackslash}X 
+  						| >{\centering\arraybackslash}X 
+  						| >{\centering\arraybackslash}X
+  						| >{\centering\arraybackslash}X
+  						| >{\centering\arraybackslash}X
+  						| >{\centering\arraybackslash}X
+  						| >{\centering\arraybackslash}X
+   						| >{\centering\arraybackslash}X | }
+   						\hline
+   						\multicolumn{9}{|c|}
+   						{\textbf{Truth Table}}\\
+ 						\hline
+ 					 	$w_{10}$ & $w_{11}$ & $w_{12}$ & $w_{13}$ &
+ 					 	$w_{20}$ & $w_{21}$ & $w_{22}$ & $w_{23}$ & 
+ 					 	$w_{24}$ \\
+ 						\hline
+ 						-30 & 20 & 20 & 20 & -10 & 20 & 20 & 20 & -40\\
+ 						\hline
+					\end{tabularx} 
+					\caption{Weight table}
+					\label{tab:2}
+				\end{table}	
+        		
+        		
+        		\begin{table}[h]
+        			\centering
+					\begin{tabularx}{0.8\textwidth} { 
+ 						| >{\centering\arraybackslash}X 
+  						| >{\centering\arraybackslash}X 
+  						| >{\centering\arraybackslash}X 
+  						| >{\centering\arraybackslash}X
+   						| >{\centering\arraybackslash}X | }
+   						\hline
+   						\multicolumn{5}{|c|}
+   						{\textbf{Truth Table}}\\
+ 						\hline
+ 					 	$x_1$ & $x_2$ & $x_3$ & $y_1$ & $H(x)$ \\
+ 						\hline
+ 						0 & 0 & 0 & $\sigma(-30)=0$ & $\sigma(-10)=0$\\
+ 						\hline
+ 						0 & 0 & 1 & $\sigma(-10)=0$ & $\sigma(10)=1$\\
+ 						\hline
+ 						0 & 1 & 0 & $\sigma(-10)=0$ & $\sigma(10)=1$\\
+ 						\hline
+ 						0 & 1 & 1 & $\sigma(-10)=0$ & $\sigma(10)=1$\\
+ 						\hline
+ 						1 & 0 & 0 & $\sigma(10)=1$ & $\sigma(-10)=0$\\
+ 						\hline
+ 						1 & 0 & 1 & $\sigma(10)=1$ & $\sigma(-10)=0$\\
+ 						\hline
+ 						1 & 1 & 0 & $\sigma(10)=1$ & $\sigma(-10)=0$\\
+ 						\hline
+ 						1 & 1 & 1 & $\sigma(30)=1$ & $\sigma(10)=1$\\
+						\hline
+					\end{tabularx} 
+					\caption{Parity}
+					\label{tab:3}
+				\end{table}	  
             
         \end{enumerate}
         
