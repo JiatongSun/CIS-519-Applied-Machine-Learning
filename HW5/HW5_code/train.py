@@ -33,17 +33,18 @@ if __name__ == '__main__':
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'valid']}
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = 'cpu'
     
     since = time.time()
     
-    model = CNNClassifier()
+    model = CNNClassifier().to(device)
     
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
     
     num_epochs=25
     criterion = ClassificationLoss()
-    optimizer = torch.optim.SGD(model.parameters(),lr=0.1)
+    optimizer = torch.optim.SGD(model.parameters(),lr=0.05)
     
     for epoch in range(num_epochs):
         print('\nEpoch {}/{}'.format(epoch+1, num_epochs))
