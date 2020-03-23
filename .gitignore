@@ -4,4 +4,4 @@ __pycache__
 *.log
 *.gz
 *.out
-*.pt
+events.out.tfevents.*

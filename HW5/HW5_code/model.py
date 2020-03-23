@@ -28,18 +28,19 @@ class CNNClassifier(torch.nn.Module):
             torch.nn.Conv2d(3,6,kernel_size=3,stride=1,padding=1),
             torch.nn.ReLU(True),
             torch.nn.MaxPool2d(2,2),
-            torch.nn.Conv2d(6,10,kernel_size=3,stride=1,padding=1),
+            torch.nn.Conv2d(6,12,kernel_size=3,stride=1,padding=1),
             torch.nn.ReLU(True),
             torch.nn.MaxPool2d(2,2),
-            torch.nn.Conv2d(10,16,kernel_size=3,stride=1,padding=1),
+            torch.nn.Conv2d(12,24,kernel_size=3,stride=1,padding=1),
             torch.nn.ReLU(True),
             torch.nn.MaxPool2d(2,2),
-            torch.nn.Conv2d(16,20,kernel_size=3,stride=1,padding=1),
-            torch.nn.ReLU(True),
-            torch.nn.MaxPool2d(2,2)
+            # torch.nn.Conv2d(24,48,kernel_size=3,stride=1,padding=1),
+            # torch.nn.ReLU(True),
+            # torch.nn.MaxPool2d(2,2)
         )
         self.fc = torch.nn.Sequential(
-            torch.nn.Linear(320,100),
+            torch.nn.Linear(1536,100),
+            torch.nn.Linear(100,100),
             torch.nn.Linear(100,6)
         )
         for m in self.modules():

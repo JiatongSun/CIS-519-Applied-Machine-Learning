@@ -1,16 +1,9 @@
 import torch
 import torchvision
-
-import torch.utils.tensorboard as tb
-
+from torch.utils.data import Dataset
 from PIL import Image
-
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms
-
 import matplotlib.pyplot as plt
 import pandas as pd
-
 import os
 
 LABEL_NAMES = {'background':0, 'kart':1, 'pickup':2, 'nitro':3, 'bomb':4, 'projectile':5}

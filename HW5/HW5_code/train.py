@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from dataset import SuperTuxDataset
 from model import ClassificationLoss, CNNClassifier
+from save_and_load import save_model, load_model
 
 if __name__ == '__main__':
     data_transforms = {
@@ -45,7 +46,7 @@ if __name__ == '__main__':
     num_epochs=25
     criterion = ClassificationLoss()
     optimizer = torch.optim.SGD(model.parameters(),lr=0.05)
-    
+        
     for epoch in range(num_epochs):
         print('\nEpoch {}/{}'.format(epoch+1, num_epochs))
         print('-' * 10)
@@ -94,5 +95,5 @@ if __name__ == '__main__':
     print('Best valid Acc: {:4f}'.format(best_acc))
 
     model.load_state_dict(best_model_wts)
-
+    save_model(model)
 
