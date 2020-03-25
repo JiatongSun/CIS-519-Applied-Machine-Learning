@@ -1,7 +1,4 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import torch
-import torch.nn.functional as F
 import torchvision
 from torch.utils.data import DataLoader
 import time
@@ -16,10 +13,11 @@ from save_and_load import save_model, load_model
 if __name__ == '__main__':
     data_transforms = {
         'train': torchvision.transforms.Compose([
-            torchvision.transforms.ToTensor(),
+            torchvision.transforms.RandomHorizontalFlip(),
+            torchvision.transforms.ToTensor()
         ]),
         'valid': torchvision.transforms.Compose([
-            torchvision.transforms.ToTensor(),
+            torchvision.transforms.ToTensor()
         ]),
     }
     
@@ -34,18 +32,19 @@ if __name__ == '__main__':
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'valid']}
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    device = 'cpu'
     
     since = time.time()
     
     model = CNNClassifier().to(device)
+    # model = load_model()
     
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
     
-    num_epochs=25
+    num_epochs=100
     criterion = ClassificationLoss()
-    optimizer = torch.optim.SGD(model.parameters(),lr=0.05)
+    optimizer = torch.optim.SGD(model.parameters(),lr=0.05,momentum=0.9)
+    # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 25)
         
     for epoch in range(num_epochs):
         print('\nEpoch {}/{}'.format(epoch+1, num_epochs))
@@ -77,6 +76,8 @@ if __name__ == '__main__':
 
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
+            # if phase == 'train':
+            #     scheduler.step()
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]

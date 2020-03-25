@@ -1,6 +1,4 @@
 import torch
-import numpy as np
-import torch.nn.functional as F
 
 class ClassificationLoss(torch.nn.Module):
     def forward(self, inputs, target):
@@ -28,27 +26,28 @@ class CNNClassifier(torch.nn.Module):
             torch.nn.Conv2d(3,6,kernel_size=3,stride=1,padding=1),
             torch.nn.ReLU(True),
             torch.nn.MaxPool2d(2,2),
+            torch.nn.BatchNorm2d(6),
             torch.nn.Conv2d(6,12,kernel_size=3,stride=1,padding=1),
             torch.nn.ReLU(True),
             torch.nn.MaxPool2d(2,2),
+            torch.nn.BatchNorm2d(12),
             torch.nn.Conv2d(12,24,kernel_size=3,stride=1,padding=1),
             torch.nn.ReLU(True),
+            torch.nn.Conv2d(24,24,kernel_size=3,stride=1,padding=1),
+            torch.nn.ReLU(True),
+            torch.nn.Conv2d(24,20,kernel_size=3,stride=1,padding=1),
+            torch.nn.ReLU(True),
             torch.nn.MaxPool2d(2,2),
-            # torch.nn.Conv2d(24,48,kernel_size=3,stride=1,padding=1),
-            # torch.nn.ReLU(True),
-            # torch.nn.MaxPool2d(2,2)
         )
         self.fc = torch.nn.Sequential(
-            torch.nn.Linear(1536,100),
-            torch.nn.Linear(100,100),
+            torch.nn.Linear(1280,400),
+            torch.nn.ReLU(True),
+            torch.nn.Dropout2d(0.15),
+            torch.nn.Linear(400,100),
+            torch.nn.ReLU(True),
+            torch.nn.Dropout2d(0.15),
             torch.nn.Linear(100,6)
         )
-        for m in self.modules():
-            if isinstance(m,torch.nn.Linear):
-                torch.nn.init.normal_(m.weight,mean=0,std=0.1)
-                torch.nn.init.constant_(m.bias,0.1)
-            if isinstance(m,torch.nn.Conv2d):
-                torch.nn.init.normal_(m.weight,mean=0,std=0.1)
 
     def forward(self, x):
         """
