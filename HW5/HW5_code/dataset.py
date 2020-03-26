@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 from PIL import Image
 import matplotlib.pyplot as plt
 import pandas as pd
-import os
+from os import path
 
 LABEL_NAMES = {'background':0, 'kart':1, 'pickup':2, 'nitro':3, 'bomb':4, 'projectile':5}
 
@@ -17,7 +17,7 @@ class SuperTuxDataset(Dataset):
         Hint: Use the python csv library to parse labels.csv
         """
         
-        self.df = pd.read_csv(os.path.join(image_path,'labels.csv'), header=0)
+        self.df = pd.read_csv(path.join(image_path,'labels.csv'), header=0)
         self.path = image_path
         self.files = self.df.iloc[:,0].values
         self.labels = self.df.iloc[:,1].astype('category').cat.codes.values
@@ -46,7 +46,7 @@ class SuperTuxDataset(Dataset):
             idx = idx.tolist()
 
         img_name = self.files[idx]
-        image = self.transform(Image.open(os.path.join(self.path,img_name)))
+        image = self.transform(Image.open(path.join(self.path,img_name)))
         label = self.labels[idx]
         sample = (image, label)
         return sample

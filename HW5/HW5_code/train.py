@@ -2,7 +2,7 @@ import torch
 import torchvision
 from torch.utils.data import DataLoader
 import time
-import os
+from os import path
 import copy
 from tqdm import tqdm
 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     }
     
     data_dir = 'data'
-    image_datasets = {x: SuperTuxDataset(os.path.join(data_dir, x),
+    image_datasets = {x: SuperTuxDataset(path.join(data_dir, x),
                                          data_transforms[x])
                       for x in ['train', 'valid']}
     dataloaders = {x: DataLoader(image_datasets[x], 
@@ -43,8 +43,12 @@ if __name__ == '__main__':
     
     num_epochs=100
     criterion = ClassificationLoss()
-    optimizer = torch.optim.SGD(model.parameters(),lr=0.05,momentum=0.9)
-    # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 25)
+    optimizer = torch.optim.SGD(model.parameters(),
+                                lr=0.005,
+                                momentum=0.9)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
+                                                step_size = 5,
+                                                gamma = 0.5)
         
     for epoch in range(num_epochs):
         print('\nEpoch {}/{}'.format(epoch+1, num_epochs))
@@ -76,8 +80,8 @@ if __name__ == '__main__':
 
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
-            # if phase == 'train':
-            #     scheduler.step()
+            if phase == 'train':
+                scheduler.step()
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]

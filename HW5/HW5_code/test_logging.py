@@ -46,8 +46,8 @@ if __name__ == '__main__':
     # %load_ext tensorboard
     # %reload_ext tensorboard
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    ROOT_LOG_DIR = './logdir'
-    # %tensorboard --logdir {ROOT_LOG_DIR} --host=127.0.0.1
+    ROOT_LOG_DIR = './log_dir'
+    # %tensorboard --logdir {ROOT_LOG_DIR} --host=127.0.0.1 --port 9999
     train_logger = tb.SummaryWriter(path.join('./logdir', 'train'))
     valid_logger = tb.SummaryWriter(path.join('./logdir', 'test'))
     test_logging(train_logger, valid_logger)

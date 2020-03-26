@@ -4,7 +4,6 @@ from torch.utils.data import DataLoader
 import torch.utils.tensorboard as tb
 from os import path
 import time
-import os
 import copy
 from tqdm import tqdm
 
@@ -21,8 +20,10 @@ def load_data(dataset_path, data_transforms=None,
 
 class Args(object):
   def  __init__(self):
-    self.learning_rate = 0.008
+    self.learning_rate = 0.005
     self.momentum = 0.9
+    self.step_size = 5
+    self.gamma = 0.5
     self.log_dir = './logdir'
     self.epoch = 50
     self.data_dir = 'data'
@@ -40,7 +41,7 @@ def train(args):
     data_transforms = args.data_transforms
     data_dir = args.data_dir
     
-    image_datasets = {x: SuperTuxDataset(os.path.join(data_dir, x),
+    image_datasets = {x: SuperTuxDataset(path.join(data_dir, x),
                                          data_transforms[x])
                       for x in ['train', 'valid']}
     dataloaders = {x: DataLoader(image_datasets[x], 
@@ -64,6 +65,9 @@ def train(args):
     optimizer = torch.optim.SGD(model.parameters(),
                                 lr=args.learning_rate,
                                 momentum = args.momentum)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
+                                        step_size = args.step_size,
+                                        gamma = args.gamma)
     
     global_step_train = 0
     global_step_valid = 0
@@ -113,7 +117,10 @@ def train(args):
                                             loss.item(),
                                             global_step_valid)
                     global_step_valid += 1
-
+            
+            if phase == 'train':
+                scheduler.step()
+            
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
             
