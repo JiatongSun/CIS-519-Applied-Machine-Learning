@@ -6,7 +6,7 @@
 *__If you haven't loaded tensorboard, please do the followings:__*
 
 1. Change to working directory (Can simply run a `.py` file in Spyder and Spyder can automatically change folder )
-2. Create a new folder for save log, eg. `./logdir'`
+2. Create a new folder for save log, eg. `"./logdir"`
 3. Execute `%load_ext tensorboard` in Spyder Console
 4. Execute `%tensorboard --logdir="./logdir" --host=127.0.0.1`  (You should see `"Launching Tensorboard..."`)
 5. Open web browser and search <localhost:6006> (An orange webpage saying "No dashboards are active")

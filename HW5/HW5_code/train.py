@@ -38,6 +38,7 @@ if __name__ == '__main__':
     model = CNNClassifier().to(device)
     # model = load_model()
     
+    best_epoch = 0
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
     
@@ -92,6 +93,10 @@ if __name__ == '__main__':
             if phase == 'valid' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
+            
+            if epoch-best_epoch > 5:
+                print('Early stopping!')
+                train_flag = False
 
 
     time_elapsed = time.time() - since
