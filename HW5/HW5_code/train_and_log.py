@@ -19,23 +19,23 @@ def load_data(dataset_path, data_transforms=None,
                       batch_size=batch_size, shuffle=True)
 
 class Args(object):
-  def  __init__(self):
-    self.learning_rate = 0.005
-    self.momentum = 0.9
-    self.step_size = 5
-    self.gamma = 0.5
-    self.log_dir = './logdir'
-    self.epoch = 50
-    self.data_dir = 'data'
-    self.data_transforms = {
-        'train': torchvision.transforms.Compose([
-            torchvision.transforms.RandomHorizontalFlip(),
-            torchvision.transforms.ToTensor()
-        ]),
-        'valid': torchvision.transforms.Compose([
-            torchvision.transforms.ToTensor()
-        ]),
-    }
+    def  __init__(self):
+        self.learning_rate = 0.005
+        self.momentum = 0.9
+        self.step_size = 5
+        self.gamma = 0.5
+        self.log_dir = './logdir'
+        self.epoch = 3
+        self.data_dir = 'data'
+        self.data_transforms = {
+            'train': torchvision.transforms.Compose([
+                torchvision.transforms.RandomHorizontalFlip(),
+                torchvision.transforms.ToTensor()
+            ]),
+            'valid': torchvision.transforms.Compose([
+                torchvision.transforms.ToTensor()
+            ]),
+      }
 
 def train(args):
     data_transforms = args.data_transforms
@@ -150,5 +150,10 @@ def train(args):
     save_model(model)
     
 if __name__ == '__main__':
+    # %load_ext tensorboard
+    # %reload_ext tensorboard
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    ROOT_LOG_DIR = './logdir'
+    # %tensorboard --logdir {ROOT_LOG_DIR} --host=127.0.0.2 --port 9999
     args = Args()
     train(args)

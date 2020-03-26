@@ -1,4 +1,4 @@
-import torchvision.transforms as TF
+import torchvision.transforms.functional as TF
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import numpy as np
@@ -34,7 +34,7 @@ def visualize_predictions():
     model = load_model()
     model.eval()
 
-    validation_image_path='' #enter the path 
+    validation_image_path='data/valid/' #enter the path 
 
     dataset = SuperTuxDataset(image_path=validation_image_path)
 
@@ -51,3 +51,6 @@ def visualize_predictions():
         draw_bar(axes[1, i], preds[0], LABEL_ if i == 0 else None)
 
     plt.show()
+    
+if __name__ == '__main__':
+    visualize_predictions()
