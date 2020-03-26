@@ -25,7 +25,7 @@ class Args(object):
         self.step_size = 5
         self.gamma = 0.5
         self.log_dir = './logdir'
-        self.epoch = 3
+        self.epoch = 200
         self.data_dir = 'data'
         self.data_transforms = {
             'train': torchvision.transforms.Compose([
@@ -72,11 +72,17 @@ def train(args):
     global_step_train = 0
     global_step_valid = 0
     
+    train_flag = True
+    
     if args.log_dir is not None:
         train_logger = tb.SummaryWriter(path.join(args.log_dir, 'train'))
         valid_logger = tb.SummaryWriter(path.join(args.log_dir, 'valid'))
     
     for epoch in range(num_epochs):
+        if train_flag is False:
+            print('stop training!')
+            break
+        
         print('\nEpoch {}/{}'.format(epoch+1, num_epochs))
         print('-' * 10)
 
@@ -137,8 +143,13 @@ def train(args):
                 phase, epoch_loss, epoch_acc))
 
             if phase == 'valid' and epoch_acc > best_acc:
+                best_epoch = epoch
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
+            
+            if epoch-best_epoch == 10:
+                print('Early stopping!')
+                train_flag = False
 
 
     time_elapsed = time.time() - since
@@ -152,8 +163,7 @@ def train(args):
 if __name__ == '__main__':
     # %load_ext tensorboard
     # %reload_ext tensorboard
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     ROOT_LOG_DIR = './logdir'
-    # %tensorboard --logdir {ROOT_LOG_DIR} --host=127.0.0.2 --port 9999
+    # %tensorboard --logdir {ROOT_LOG_DIR} --host=127.0.0.1
     args = Args()
     train(args)
