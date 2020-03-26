@@ -57,6 +57,7 @@ def train(args):
     model = CNNClassifier().to(device)
     # model = load_model()
     
+    best_epoch = 0
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
     
@@ -163,7 +164,6 @@ def train(args):
 if __name__ == '__main__':
     # %load_ext tensorboard
     # %reload_ext tensorboard
-    ROOT_LOG_DIR = './logdir'
-    # %tensorboard --logdir {ROOT_LOG_DIR} --host=127.0.0.1
+    # %tensorboard --logdir="./logdir" --host=127.0.0.1
     args = Args()
     train(args)
