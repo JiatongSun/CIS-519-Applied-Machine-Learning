@@ -21,7 +21,7 @@
 \begin{document}
     \maketitle
     \noindent
-    Although the solutions are entirely my own, I consulted with the following people and sources while working on this homework: \\
+    Although the solutions are entirely my own, I consulted with the following people and sources while working on this homework: $Yuchen Sun$, $Junfan Pan$\\
     https://stackoverflow.com/questions/50994504/how-to-put-figure-between-items-on-enumerate-list
     
     \section{Logical Functions with Neural Nets}
@@ -137,8 +137,33 @@
         \end{enumerate}
         
     \section{Calculating Backprop by Hand}
-    	Assume the loss function utilizes mean square error:
-    	$$L(H(X),y)=\frac{1}{n}\sum_{i=1}^{n}(H(x_i)-y_i)^2$$
+    	Since the hidden layer uses a sign function and the output layer uses a sigmoid function, the output can be expressed as follows:
+    	$$a_2(\boldsymbol{X})=
+    	Sigmoid(b_2(\boldsymbol{X}))=
+    	\dfrac{1}{1+e^{-b_2(\boldsymbol{X})}}=
+    	\dfrac{1}{1+e^{-\boldsymbol{W^2}a_1(\boldsymbol{X})}}=
+    	\dfrac{1}{1+e^{-\boldsymbol{W^2}\cdot Sign(\boldsymbol{W^1}\boldsymbol{X})}}$$
+    	where
+    	$$a_1(\boldsymbol{X})=
+    	Sign(b_1(\boldsymbol{X}))=
+    	Sign(\boldsymbol{W^1}\boldsymbol{X})=
+    	Sign(\begin{bmatrix}0.1 & 0.2\\-0.4 & 0.3\end{bmatrix} \begin{bmatrix}5\\4\end{bmatrix})=
+    	Sign(\begin{bmatrix}1.3\\-0.8\end{bmatrix})=
+    	\begin{bmatrix}1\\-1\end{bmatrix}$$
+    	and
+    	$$a_2(\boldsymbol{X})=
+    	\dfrac{1}{1+e^{-\boldsymbol{W^2}a_1(\boldsymbol{X})}}=
+    	\dfrac{1}{1+e^{-\begin{bmatrix}0.1&0.2\end{bmatrix}\begin{bmatrix}1\\-1\end{bmatrix}}}=
+    	\dfrac{1}{1+e^{0.1}}=0.475$$
+    	To calculate the output gradient with respect to each of the weights, we can use the chain rule and thus, we know that
+    	$$\dfrac{da_2(\boldsymbol{X})}{d\boldsymbol{W^2}}=
+    	\dfrac{da_2(\boldsymbol{X})}{db_2(\boldsymbol{X})}\dfrac{db_2(\boldsymbol{X})}{d\boldsymbol{W^2}}=
+    	[a_2(\boldsymbol{X})(1-a_2(\boldsymbol{X}))]\cdot a_1(\boldsymbol{X})=0.475\cdot(1-0.475)\cdot\begin{bmatrix}1\\-1\end{bmatrix}=\begin{bmatrix}0.249\\-0.249\end{bmatrix}$$
+    	$$\dfrac{da_2(\boldsymbol{X})}{d\boldsymbol{W^1}}=
+    	\dfrac{da_2(\boldsymbol{X})}{db_2(\boldsymbol{X})}\dfrac{db_2(\boldsymbol{X})}{da_1(\boldsymbol{X})}\dfrac{da_1(\boldsymbol{X})}{db_1(\boldsymbol{X})}\dfrac{db_1(\boldsymbol{X})}{d\boldsymbol{W^1}}=
+    	0.249\cdot\boldsymbol{W^2}\cdot\begin{bmatrix}0\\1\end{bmatrix}\cdot\boldsymbol{W^1}=0.249\cdot\begin{bmatrix}0.1&0.2\end{bmatrix}\cdot\begin{bmatrix}0\\1\end{bmatrix}\cdot\begin{bmatrix}0.1 & 0.2\\-0.4 & 0.3\end{bmatrix}=\begin{bmatrix}0.005 & 0.01\\-0.02 & 0.015\end{bmatrix}$$
+    	$$$$
+			
         
     \section{Neural Nets in SuperTuxKart}
        

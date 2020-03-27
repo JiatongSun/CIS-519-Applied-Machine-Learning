@@ -148,7 +148,7 @@ def train(args):
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
             
-            if epoch-best_epoch > 5:
+            if epoch-best_epoch > 10:
                 print('Early stopping!')
                 train_flag = False
 

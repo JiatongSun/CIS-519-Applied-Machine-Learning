@@ -50,8 +50,13 @@ if __name__ == '__main__':
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
                                                 step_size = 5,
                                                 gamma = 0.5)
+    train_flag = True
         
     for epoch in range(num_epochs):
+        if train_flag is False:
+            print('stop training!')
+            break
+        
         print('\nEpoch {}/{}'.format(epoch+1, num_epochs))
         print('-' * 10)
 
@@ -91,10 +96,11 @@ if __name__ == '__main__':
                 phase, epoch_loss, epoch_acc))
 
             if phase == 'valid' and epoch_acc > best_acc:
+                best_epoch = epoch
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
             
-            if epoch-best_epoch > 5:
+            if epoch-best_epoch > 10:
                 print('Early stopping!')
                 train_flag = False
 
