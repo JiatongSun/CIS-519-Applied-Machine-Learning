@@ -1,11 +1,20 @@
+import torch
 import torchvision.transforms.functional as TF
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
+from torch.utils.data import DataLoader
 import numpy as np
 from dataset import SuperTuxDataset
 from save_and_load import load_model
+from tqdm import tqdm
 
 LABEL_=['background','kart','pickup','nitro','bomb','projectile']
+
+def load_data(dataset_path, data_transforms=None, 
+              num_workers=0, batch_size=128):
+    dataset = SuperTuxDataset(dataset_path,data_transforms)
+    return DataLoader(dataset, num_workers=num_workers, 
+                      batch_size=batch_size, shuffle=True)
 
 def accuracy(outputs, labels):
     outputs_idx = outputs.max(1)[1].type_as(labels)
@@ -52,5 +61,27 @@ def visualize_predictions():
 
     plt.show()
     
+def test_performance_val(): 
+        """test Validation accuracy"""        
+        model = load_model()
+        model.eval()
+        # model=CNNClassifier()
+        correct = 0        
+        validation_image_path='data/valid/' #enter the path 
+        with torch.no_grad():
+            for data, target in tqdm(load_data(validation_image_path),
+                                     position=0):
+                output = model(data)
+                pred = output.argmax(dim=1, keepdim=True)
+                correct += pred.eq(target.view_as(pred)).sum().item()
+                # print(pred)
+        validloader = load_data(validation_image_path)
+        for i, data in tqdm(enumerate(validloader, 0),position=0):
+            inputs, labels = data
+            preds = predict(model, inputs, device='cpu')
+            acc = accuracy(preds, labels)
+        print("\nYour accuracy is ", acc)
+    
 if __name__ == '__main__':
-    visualize_predictions()
+    # visualize_predictions()
+    test_performance_val()

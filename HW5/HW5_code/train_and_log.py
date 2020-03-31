@@ -11,13 +11,6 @@ from dataset import SuperTuxDataset
 from model import ClassificationLoss, CNNClassifier
 from save_and_load import save_model, load_model
 
-
-def load_data(dataset_path, data_transforms=None, 
-              num_workers=0, batch_size=128):
-    dataset = SuperTuxDataset(dataset_path,data_transforms)
-    return DataLoader(dataset, num_workers=num_workers, 
-                      batch_size=batch_size, shuffle=True)
-
 class Args(object):
     def  __init__(self):
         self.learning_rate = 0.005
