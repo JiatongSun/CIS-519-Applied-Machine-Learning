@@ -2,7 +2,7 @@
 
 This repository is for saving homework of CIS 519.
 
-HW0: Basic math and program knowledge
+HW0: Basic Math and Program Knowledge
 
 HW1: Decision Tree
 
