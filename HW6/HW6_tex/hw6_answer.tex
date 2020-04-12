@@ -14,6 +14,9 @@
 \usepackage{float}
 \usepackage[section]{placeins}
 \usepackage{empheq}
+\usepackage{stackengine}
+
+\def\delequal{\mathrel{\ensurestackMath{\stackon[1pt]{=}{\scriptstyle\Delta}}}}
 
 
 \title{CIS 419/519: Homework 6}
@@ -32,6 +35,38 @@
     There are two easy ways to solve the problem: increase the episode length and/or give non-goal state a value -1. This means the states that have been visited a lot will get worse and worse values so the agent will want to avoid that state. In this way, the agent can eventually reach the goal.
         
     \section{Reinforcement Learning \uppercase\expandafter{\romannumeral 2}}
+    According to equation for the expected discount return and value of a state:
+    $$R_t=\sum_{k=0}^{\infty}\gamma^kr_{t+k+1}\qquad V^{\pi}(s)=\mathbb{E}[R_t|s_t=s]$$
+    If we add a constant $C$ to all the rewards, the total reward changes into
+    \begin{equation}\label{eq:reward}
+    	\begin{split}
+    	R'_t
+    	&=\sum_{k=0}^{\infty}\gamma^k(r_{t+k+1}+C)\\
+    	&=\sum_{k=0}^{\infty}\gamma^kr_{t+k+1}+\sum_{k=0}^{\infty}\gamma^kC\\
+    	&=\sum_{k=0}^{\infty}\gamma^kr_{t+k+1}+\dfrac{C}{1-\gamma} \\
+    	&=R_t+\dfrac{C}{1-\gamma}
+    	\end{split}
+    \end{equation}
+    The state value changes into
+    \begin{equation}\label{eq:state value}
+    	\begin{split}
+    	V^{\pi'}(s)
+    	&=\mathbb{E}[R_t'|s_t=s]\\
+    	&=\mathbb{E}[R_t+\dfrac{C}{1-\gamma}|s_t=s]\\
+    	&=\mathbb{E}[R_t|s_t=s]+\dfrac{C}{1-\gamma}\\
+    	&=V^{\pi}(s)+\dfrac{C}{1-\gamma}
+    	\end{split}
+    \end{equation}
+    Define $K\delequal\sum_{k=0}^{\infty}\gamma^kC=\dfrac{C}{1-\gamma}$, then $K$ is a constant.\\\\
+    \begin{enumerate}
+    	\item[(a)]
+    	From equation \ref{eq:reward} and equation \ref{eq:state value}, we know that adding a constant to all the rewards only has the effect of shifting the total reward and state value, so the relative reward and relative state value remain the same. \\\\
+    	Because we choose the policy that maximize the total reward, we still get the same best policy as before. So \textbf{only the interval between those rewards matters}.\\\\
+    	The signs of those rewards are not important. For example, if we change \{+1 for a goal, -1 for a collision\} to \{-1 for a goal, -3 for a collision\}, the best policy gets worse rewards, but it will still be the best policy among all. Changing every reward to negative value essentially means finding a relative better policy among a group of bad policies.
+    	\item[(b)]See the proof above.
+    	\item[(c)]$K=\sum_{k=0}^{\infty}\gamma^kC=\dfrac{C}{1-\gamma},\; 0<\gamma<1$
+    \end{enumerate}
+    
     	
     \section{Random policy for the MountainCar gym environment}
        
