@@ -109,7 +109,7 @@
  			\hline
  			0 & position & -1.2 & 0.6\\
  			\hline
- 			0 & velocity & -0.07 & 0.07\\
+ 			1 & velocity & -0.07 & 0.07\\
  			\hline
 		\end{tabularx} 
 		\label{tab:2}
@@ -140,5 +140,13 @@
 		The mean reward obtained by the random policy over 10 episodes is -200.
     \end{enumerate}
     
+    \section{Train a Q-learner and generate expert trajectories}
+    \begin{itemize}
+    	\item 
+    	The function \verb|discretize()| attempts to change the continuous observation space into a discrete state space.\\\\
+    	We need this function because when we update the Q matrix, we need the index to be integers, so we cannot use the observation (which has float elements) directly. So we need the \verb|discretize()| function to discretize the state first. It also makes sense in that we don't want the number of states to be infinite, and this function helps reduce the number of states to finite. 
+    	\item
+    	If we increase any element of the \verb|discretization| argument, it will divide the corresponding observation into more intervals and thus can make the Q-learning model more accurate, but meanwhile the model size will increase as well.
+    \end{itemize}    
        
 \end{document}
