@@ -171,7 +171,8 @@ if __name__ == '__main__':
     
     
     #InitQ
-    num_states = (env.observation_space.high - env.observation_space.low)*discretization
+    num_states = (env.observation_space.high - 
+                  env.observation_space.low) * discretization
     #Size of discretized state space 
     num_states = np.round(num_states, 0).astype(int) + 1
     # Initialize Q table

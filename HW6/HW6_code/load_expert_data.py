@@ -19,15 +19,9 @@ class Args(object):
         self.step_size = 5
         self.gamma = 0.5
         self.epoch = 200
-        self.data_transforms = {
-            'train': torchvision.transforms.Compose([
-                torchvision.transforms.RandomHorizontalFlip(),
-                torchvision.transforms.ToTensor()
-            ]),
-            'valid': torchvision.transforms.Compose([
-                torchvision.transforms.ToTensor()
-            ]),
-      }
+        self.data_transforms = torchvision.transforms.Compose([
+                                torchvision.transforms.ToTensor()
+                                ])
         
 def load_initial_data(args):
     num_file = 0
@@ -48,7 +42,25 @@ def load_initial_data(args):
         num_file += 1
     return training_observations, training_actions
 
+def load_dataset(args, observations, actions, batch_size=64, data_transforms=None, num_workers=0):
+    
+    dataset = np.hstack((observations, actions))
+    if data_transforms is None:
+        dataset = args.data_transforms(dataset)
+    else:
+        dataset = data_transforms(dataset)
+    dataloader = DataLoader(dataset, 
+                            num_workers=num_workers, 
+                            batch_size=batch_size)
+    return dataloader
+
+def process_individual_observation(args,observation):
+    
+    data = args.data_transforms(observation)
+    return data
+
 
 if __name__ == '__main__':
     args = Args()
-    training_observations, training_actions = load_initial_data(args)
+    expert_observations, expert_actions = load_initial_data(args)
+    load_dataset(args, expert_observations, expert_actions)
