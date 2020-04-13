@@ -31,9 +31,9 @@ def dummy_policy(env, num_episodes):
         if i_episode == num_episodes-1: record = True
         episode_reward = 0
         observation = env.reset()
-        for t in range(100):
+        for t in range(200):
             im = env.render()
-            # print(observation)
+            print(observation)
             action = env.action_space.sample()
             observation, reward, done, info = env.step(action)
             episode_reward += reward
@@ -43,7 +43,8 @@ def dummy_policy(env, num_episodes):
                 print("Episode finished after {} timesteps".format(t+1))
                 break
         total_reward += episode_reward
-    mean_reward = total_reward / num_episodes;
+    mean_reward = total_reward / num_episodes
+    print(f'mean reward: {mean_reward}')
     return mean_reward, frames
 
 if __name__ == '__main__':

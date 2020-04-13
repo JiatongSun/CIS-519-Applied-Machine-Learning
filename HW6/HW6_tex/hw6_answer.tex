@@ -69,5 +69,76 @@
     
     	
     \section{Random policy for the MountainCar gym environment}
+    \begin{enumerate}
+    	\item[(\romannumeral 1)]
+    	action space:\\
+    	
+		\begin{table}[h]
+        \centering
+		\begin{tabularx}{0.4\textwidth} { 
+ 			| >{\centering\arraybackslash}X 
+   			| >{\centering\arraybackslash}X | }
+ 			\hline
+ 			\textbf{Num} & 
+ 			\textbf{Action}\\
+ 			\hline
+ 			0 & push left\\
+ 			\hline
+ 			1 & no push\\
+ 			\hline
+ 			2 & push right\\
+ 			\hline
+		\end{tabularx} 
+		\label{tab:1}
+		\end{table}
+		
+		observation space:\\
+		   
+		\begin{table}[h]
+        \centering
+		\begin{tabularx}{0.8\textwidth} { 
+ 			| >{\centering\arraybackslash}X 
+  			| >{\centering\arraybackslash}X
+  			| >{\centering\arraybackslash}X 
+   			| >{\centering\arraybackslash}X | }
+ 			\hline
+ 			\textbf{Num} & 
+ 			\textbf{Observation} & 
+ 			\textbf{Min} &
+ 			\textbf{Max}\\
+ 			\hline
+ 			0 & position & -1.2 & 0.6\\
+ 			\hline
+ 			0 & velocity & -0.07 & 0.07\\
+ 			\hline
+		\end{tabularx} 
+		\label{tab:2}
+		\end{table}
+		
+		state dimensionality:\\
+		
+		\begin{table}[h]
+        \centering
+		\begin{tabularx}{0.6\textwidth} { 
+ 			| >{\centering\arraybackslash}X 
+ 			| >{\centering\arraybackslash}X
+   			| >{\centering\arraybackslash}X | }
+ 			\hline
+ 			\textbf{Num} & 
+ 			\textbf{State} &
+ 			\textbf{Reward}\\
+ 			\hline
+ 			0 & non-goal & -1\\
+ 			\hline
+ 			1 & goal & 1\\
+ 			\hline
+		\end{tabularx} 
+		\label{tab:1}
+		\end{table}
+		
+		\item[(\romannumeral 2)]
+		The mean reward obtained by the random policy over 10 episodes is -200.
+    \end{enumerate}
+    
        
 \end{document}
