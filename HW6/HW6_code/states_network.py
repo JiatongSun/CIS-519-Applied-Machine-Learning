@@ -3,18 +3,15 @@ import torch.nn as nn
 class StatesNetwork(nn.Module):
     def __init__(self, env):
         super(StatesNetwork,self).__init__()
-        self.observation_space = env.observation_space.high -\
-                                 env.observation_space.low
-        self.action_space = env.action_space.high -\
-                            env.action_space.low
+        num_observation = env.observation_space.shape[0]
+        num_action = env.action_space.n
         self.fc = nn.Sequential(
-            nn.Linear(64,128),
+            nn.Linear(num_observation,5),
             nn.ReLU(True),
-            nn.Linear(128,128),
-            nn.ReLU(True),
-            nn.Linear(128,64)
+            nn.Linear(5,num_action)
         )
     
     def forward(self, x):    
+        x = x.view(x.size(0),-1)
         forward_pass = self.fc(x)
         return forward_pass

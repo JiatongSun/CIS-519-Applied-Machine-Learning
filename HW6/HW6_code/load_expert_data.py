@@ -1,27 +1,14 @@
 import numpy as np
+import gym
 import torch
-import torchvision
-from torch.utils.data import DataLoader
-import torch.utils.tensorboard as tb
+import torchvision.transforms as tf
+from torch.utils.data import Dataset, DataLoader
 from os import path
-import time
-import copy
 from glob import glob
-from tqdm import tqdm
 
+from args import Args
+from resize_observation import ResizeObservation
 
-class Args(object):
-    def  __init__(self):
-        self.data_path = './data'
-        self.num_expert_episode = 100
-        self.learning_rate = 0.005
-        self.momentum = 0.9
-        self.step_size = 5
-        self.gamma = 0.5
-        self.epoch = 200
-        self.data_transforms = torchvision.transforms.Compose([
-                                torchvision.transforms.ToTensor()
-                                ])
         
 def load_initial_data(args):
     num_file = 0
@@ -43,24 +30,41 @@ def load_initial_data(args):
     return training_observations, training_actions
 
 def load_dataset(args, observations, actions, batch_size=64, data_transforms=None, num_workers=0):
+    class dataset(Dataset):
+        def __init__(self,transform,observations,actions):
+            self.observations = observations
+            self.actions = actions
+            self.transform = transform
     
-    dataset = np.hstack((observations, actions))
+        def __len__(self):
+            return len(self.observations)
+    
+        def __getitem__(self,idx):
+            observations = self.transform(self.observations).float()
+            actions = torch.tensor(self.actions.reshape(-1))
+            item = {'observations': observations[:,idx], 
+                    'actions': actions[idx]}
+            return item
+        
     if data_transforms is None:
-        dataset = args.data_transforms(dataset)
+        transform = args.transform
     else:
-        dataset = data_transforms(dataset)
-    dataloader = DataLoader(dataset, 
+        transform = data_transforms
+    
+    train_dataset = dataset(transform,observations,actions)
+    
+    dataloader = DataLoader(train_dataset, 
                             num_workers=num_workers, 
                             batch_size=batch_size)
     return dataloader
 
 def process_individual_observation(args,observation):
     
-    data = args.data_transforms(observation)
+    data = args.transform(observation.reshape(1,-1)).float()
     return data
 
 
 if __name__ == '__main__':
     args = Args()
     expert_observations, expert_actions = load_initial_data(args)
-    load_dataset(args, expert_observations, expert_actions)
+    dataloader = load_dataset(args, expert_observations, expert_actions)
