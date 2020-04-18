@@ -8,6 +8,8 @@ class StatesNetwork(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(num_observation,5),
             nn.ReLU(True),
+            nn.Linear(5,5),
+            nn.ReLU(True),
             nn.Linear(5,num_action)
         )
     

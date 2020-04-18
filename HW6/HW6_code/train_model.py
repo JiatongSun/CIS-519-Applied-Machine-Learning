@@ -7,6 +7,7 @@ from args import Args
 from load_expert_data import load_initial_data, load_dataset
 from save_and_load import save_model, load_model
 from test_model import test_model
+from dagger import execute_dagger, aggregate_dataset
 
 def train_model(args):
     # initialization
@@ -15,6 +16,7 @@ def train_model(args):
     optimizer = args.optimizer
     criterion = args.criterion
     training_observations, training_actions = load_initial_data(args)
+    
     dataset_sizes = len(training_observations)
     dataloader = load_dataset(args,
                               training_observations,
@@ -31,6 +33,7 @@ def train_model(args):
     
     train_flag = True
     
+    da_iter = 0
     global_step = 0
     
     for e in range(epoch):
@@ -42,6 +45,7 @@ def train_model(args):
         running_corrects = 0
         for i,batch in enumerate(dataloader):
             inputs, labels = batch['observations'], batch['actions']
+            labels = labels.long()
             optimizer.zero_grad()
             outputs = model(inputs)
             _, preds = torch.max(outputs, axis=1)
@@ -57,6 +61,20 @@ def train_model(args):
         print('epoch: {} Loss: {:.4f} Acc: {:.4f}'.format(e,
                                                           epoch_loss, 
                                                           epoch_acc))
+        # dataset aggregation
+        if args.do_dagger is True and da_iter<args.max_dagger_iterations:
+            args.model.load_state_dict(model.state_dict())
+            imitation_observations, expert_actions = execute_dagger(args)
+            training_observations, training_actions = \
+                aggregate_dataset(training_observations, training_actions, 
+                                  imitation_observations, expert_actions)
+            dataset_sizes = len(training_observations)
+            dataloader = load_dataset(args,
+                                      training_observations,
+                                      training_actions, 
+                                      args.batch_size,
+                                      args.transform)
+        
         # valid
         total_reward = 0
         total_success = 0
