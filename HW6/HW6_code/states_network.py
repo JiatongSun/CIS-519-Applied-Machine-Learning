@@ -6,11 +6,9 @@ class StatesNetwork(nn.Module):
         num_observation = env.observation_space.shape[0]
         num_action = env.action_space.n
         self.fc = nn.Sequential(
-            nn.Linear(num_observation,5),
+            nn.Linear(num_observation,50),
             nn.ReLU(True),
-            nn.Linear(5,5),
-            nn.ReLU(True),
-            nn.Linear(5,num_action)
+            nn.Linear(50,num_action)
         )
     
     def forward(self, x):    
