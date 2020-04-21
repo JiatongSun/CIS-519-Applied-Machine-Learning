@@ -9,7 +9,7 @@ import torchvision.transforms as tf
 from torch import save
 from torch import load
 import copy
-from os import path
+import os
 import glob
 
 class ResizeObservation(gym.Wrapper):
@@ -172,7 +172,7 @@ def generate_expert_trajectories(Q, discretization, env, num_episodes=150, data_
 
 def load_initial_data(args):
     num_file = 0
-    for file in glob.glob(path.join(args.datapath, '*.npz')):
+    for file in glob.glob(os.path.join(args.datapath, '*.npz')):
         if num_file >= args.initial_episodes_to_use: break
         data = np.load(file)
         data_len = len(data['observations'])
@@ -241,81 +241,30 @@ class StatesNetwork(nn.Module):
 
         return forward_pass
 
-def train_model(args):
-    # initialization
+def train_model(args):    
     model = args.model
-    epoch = args.num_epochs
     optimizer = args.optimizer
     criterion = args.criterion
-    training_observations, training_actions = load_initial_data(args)
-    
-    dataset_sizes = len(training_observations)
-    dataloader = load_dataset(args,
-                              training_observations,
-                              training_actions, 
-                              args.batch_size,
-                              args.transform)
-    num_valid_episode = args.num_valid_episode
-        
-    global_step = 0
-    
-    best_epoch = 0
-    best_model_wts = copy.deepcopy(model.state_dict())
-    best_acc = 0.0
-    
-    train_flag = True
-    
-    for e in range(epoch):
-        if train_flag is False:
-            break
-        
-        # train
-        running_loss = 0.0
-        running_corrects = 0
-        for i,batch in enumerate(dataloader):
-            inputs, labels = batch['observations'], batch['actions']
-            labels = labels.long()
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            _, preds = torch.max(outputs, axis=1)
-            loss = criterion(outputs,labels)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item() * inputs.size(0)
-            running_corrects += torch.sum(preds == labels.data)
-            global_step += 1
-        epoch_loss = running_loss / dataset_sizes
-        epoch_acc = running_corrects.double() / dataset_sizes
-        print('epoch: {} Loss: {:.4f} Acc: {:.4f}'.format(e,
-                                                          epoch_loss, 
-                                                          epoch_acc))
-        
-        # valid
-        total_reward = 0
-        total_success = 0
-        for i_episode in range(num_valid_episode):
-            final_position, success, frames, episode_reward \
-                = test_model(args, record_frames=args.record_frames)
-            total_success += success
-            total_reward += episode_reward
-
-        success_rate = total_success / num_valid_episode
-        mean_reward = total_reward / num_valid_episode
-        print('success rate: {} mean reward: {}\n'.format(success_rate, 
-                                                          mean_reward))
-        
-        if epoch_acc > best_acc:
-            best_epoch = epoch
-            best_acc = epoch_acc
-            best_model_wts = copy.deepcopy(model.state_dict())
-                
-        if epoch-best_epoch > 10:
-            print('early stopping!')
-            train_flag = False
-
-    print('Best Acc: {:4f}'.format(best_acc))
-    model.load_state_dict(best_model_wts)
-    save_model(model)
+    dataset_sizes = args.dataset_sizes
+    dataloader = args.dataloader
+       
+    # train
+    running_loss = 0.0
+    running_corrects = 0
+    for i,batch in enumerate(dataloader):
+        inputs, labels = batch['observations'], batch['actions']
+        labels = labels.long()
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        _, preds = torch.max(outputs, axis=1)
+        loss = criterion(outputs,labels)
+        loss.backward()
+        optimizer.step()
+        running_loss += loss.item() * inputs.size(0)
+        running_corrects += torch.sum(preds == labels.data)
+    epoch_loss = running_loss / dataset_sizes
+    epoch_acc = running_corrects.double() / dataset_sizes
+    print('Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
     return model
 
@@ -412,90 +361,53 @@ def test_model(args, record_frames=False):
             state = next_state
 
 def imitate(args):
-    model = args.model
+    # initialization
     epoch = args.num_epochs
-    optimizer = args.optimizer
-    criterion = args.criterion
-    training_observations, training_actions = load_initial_data(args)
+    train_obs, train_act = load_initial_data(args)
+    batch = args.batch_size
+    transform = args.transform
     
-    dataset_sizes = len(training_observations)
-    dataloader = load_dataset(args,
-                              training_observations,
-                              training_actions, 
-                              args.batch_size,
-                              args.transform)
+    args.dataset_sizes = len(train_obs)
+    args.dataloader = load_dataset(args,train_obs,train_act,batch, transform)
     num_valid_episode = args.num_valid_episode
-        
-    global_step = 0
-    
+            
     final_positions = []
     success_history = []
     frames = []
     reward_history = []
-    
-    for dagger_iter in range(args.max_dagger_iterations):
-        print('\ndagger_iter: {}'.format(dagger_iter+1))
-        for e in range(epoch):
-            
-            # train
-            running_loss = 0.0
-            running_corrects = 0
-            for i,batch in enumerate(dataloader):
-                inputs, labels = batch['observations'], batch['actions']
-                labels = labels.long()
-                optimizer.zero_grad()
-                outputs = model(inputs)
-                _, preds = torch.max(outputs, axis=1)
-                loss = criterion(outputs,labels)
-                loss.backward()
-                optimizer.step()
-                running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
-                global_step += 1
+        
+    if args.do_dagger: epoch += args.max_dagger_iterations
 
-            epoch_loss = running_loss / dataset_sizes
-            epoch_acc = running_corrects.double() / dataset_sizes
-            print('epoch: {} Loss: {:.4f} Acc: {:.4f}'.format(e+1,
-                                                              epoch_loss, 
-                                                              epoch_acc))
-            
-            # valid
-            total_reward = 0
-            total_success = 0
-            for i_episode in range(num_valid_episode):
-                final_position, success, _, episode_reward \
-                    = test_model(args)
-                total_success += success
-                total_reward += episode_reward
-    
-            success_rate = total_success / num_valid_episode
-            mean_reward = total_reward / num_valid_episode
-            print('success rate: {} mean reward: {}'.format(success_rate, 
-                                                            mean_reward))
+    for e in range(epoch):
+        # train
+        print('epoch: {}'.format(e+1))
+        args.model = train_model(args)
         
-        # update args
-        args.model.load_state_dict(model.state_dict())
+        # dagger
+        if args.do_dagger and e>=args.num_epochs:
+            imit_obs, exp_act = execute_dagger(args)
+            train_obs, train_act = aggregate_dataset(train_obs, train_act, 
+                                                     imit_obs, exp_act)
+            args.dataset_sizes = len(train_obs)
+            args.dataloader = load_dataset(args,train_obs,train_act,batch, transform)
         
-        # dataset aggregation
-        if args.do_dagger is True:
-            args.model.load_state_dict(model.state_dict())
-            imitation_observations, expert_actions = execute_dagger(args)
-            training_observations, training_actions = \
-                aggregate_dataset(training_observations, training_actions, 
-                                  imitation_observations, expert_actions)
-            dataset_sizes = len(training_observations)
-            dataloader = load_dataset(args,
-                                      training_observations,
-                                      training_actions,
-                                      args.batch_size,
-                                      args.transform)
+        # valid
+        total_reward = 0
+        total_success = 0
+        for i_episode in range(num_valid_episode):
             final_position, success, frames_ep, episode_reward \
-                = test_model(args, record_frames=args.record_frames)
+                = test_model(args)
+            total_success += success
+            total_reward += episode_reward
             final_positions.append(final_position)
             success_history.append(success)
-            frames.append(frames_ep)
             reward_history.append(episode_reward)
-
+        frames.append(frames_ep)
+        success_rate = total_success / num_valid_episode
+        mean_reward = total_reward / num_valid_episode
+        print('success rate: {} mean reward: {}'.format(success_rate, 
+                                                        mean_reward))
+    
     return final_positions, success_history, frames, reward_history, args
 
 class Args(object):
@@ -514,7 +426,9 @@ class Args(object):
         self.discretization = np.array([10,100])
         
         # train
-        self.initial_episodes_to_use = 20
+        self.training_observations = None
+        self.training_actions = None
+        self.initial_episodes_to_use = 2
         self.batch_size = 128
         self.lr = 0.1
         self.num_epochs = 2
@@ -522,14 +436,14 @@ class Args(object):
         self.criterion = torch.nn.CrossEntropyLoss() 
         
         # dagger
-        self.do_dagger = False
+        self.do_dagger = True
         if self.do_dagger:
             self.max_dagger_iterations = 18
         else:
             self.max_dagger_iterations = 1
         
         # valid
-        self.record_frames = True
+        self.record_frames = False
         self.num_valid_episode = 5
     
 def get_args():

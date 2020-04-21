@@ -15,6 +15,8 @@
 \usepackage[section]{placeins}
 \usepackage{empheq}
 \usepackage{stackengine}
+\usepackage{subcaption}
+\usepackage{array}
 
 \def\delequal{\mathrel{\ensurestackMath{\stackon[1pt]{=}{\scriptstyle\Delta}}}}
 
@@ -26,7 +28,8 @@
 \begin{document}
     \maketitle
     \noindent
-    Although the solutions are entirely my own, I consulted with the following people and sources while working on this homework: 
+    Although the solutions are entirely my own, I consulted with the following people and sources while working on this homework: $Yuchen Sun$\\
+    https://pytorch.org/docs/stable/
     
     \section{Reinforcement Learning \uppercase\expandafter{\romannumeral 1}}
     \noindent
@@ -147,6 +150,88 @@
     	We need this function because when we update the Q matrix, we need the index to be integers, so we cannot use the observation (which has float elements) directly. So we need the \verb|discretize()| function to discretize the state first. It also makes sense in that we don't want the number of states to be infinite, and this function helps reduce the number of states to finite. 
     	\item
     	If we increase any element of the \verb|discretization| argument, it will divide the corresponding observation into more intervals and thus can make the Q-learning model more accurate, but meanwhile the model size will increase as well.
-    \end{itemize}    
-       
+    \end{itemize}   
+    
+    \section{Train an imitation policy \& Implement DAgger} 
+    \begin{figure}[h!]
+     	\centering
+     	\begin{subfigure}[b]{0.3\textwidth}
+         	\centering
+         	\includegraphics[width=\textwidth]
+         	{images/mean_reward_0}
+         	\caption{$\pi_0$ mean reward}
+         	\label{fig:pi_0_reward}
+     	\end{subfigure}
+     	\hfill
+     	\begin{subfigure}[b]{0.3\textwidth}
+         	\centering
+         	\includegraphics[width=\textwidth]
+         	{images/success_rate_0}
+         	\caption{$\pi_0$ success rate}
+         	\label{fig:pi_0_reward}
+     	\end{subfigure}
+     	\hfill
+     	\begin{subfigure}[b]{0.3\textwidth}
+         	\centering
+         	\includegraphics[width=\textwidth]
+         	{images/training_loss_0}
+         	\caption{$\pi_0$ training loss}
+         	\label{fig:pi_0_reward}
+     	\end{subfigure}
+     	\centering
+     	\begin{subfigure}[b]{0.3\textwidth}
+         	\centering
+         	\includegraphics[width=\textwidth]
+         	{images/mean_reward_1}
+         	\caption{$\pi_1$ mean reward}
+         	\label{fig:pi_1_reward}
+     	\end{subfigure}
+     	\hfill
+     	\begin{subfigure}[b]{0.3\textwidth}
+         	\centering
+         	\includegraphics[width=\textwidth]
+         	{images/success_rate_1}
+         	\caption{$\pi_1$ success rate}
+         	\label{fig:pi_1_reward}
+     	\end{subfigure}
+     	\hfill
+     	\begin{subfigure}[b]{0.3\textwidth}
+         	\centering
+         	\includegraphics[width=\textwidth]
+         	{images/training_loss_1}
+         	\caption{$\pi_1$ training loss}
+         	\label{fig:pi_1_reward}
+     	\end{subfigure}
+     	\centering
+     	\begin{subfigure}[b]{0.3\textwidth}
+         	\centering
+         	\includegraphics[width=\textwidth]
+         	{images/mean_reward_2}
+         	\caption{$\pi_2$ mean reward}
+         	\label{fig:pi_2_reward}
+     	\end{subfigure}
+     	\hfill
+     	\begin{subfigure}[b]{0.3\textwidth}
+         	\centering
+         	\includegraphics[width=\textwidth]
+         	{images/success_rate_2}
+         	\caption{$\pi_2$ success rate}
+         	\label{fig:pi_2_reward}
+     	\end{subfigure}
+     	\hfill
+     	\begin{subfigure}[b]{0.3\textwidth}
+         	\centering
+         	\includegraphics[width=\textwidth]
+         	{images/training_loss_2}
+         	\caption{$\pi_2$ training loss}
+         	\label{fig:pi_2_reward}
+     	\end{subfigure}
+	\end{figure}
+	
+	\noindent
+	Analysis:\\\\
+	1. Mean Reward: For $\pi_0$, the mean reward is a straight line because there are only two epochs so the tests can only be run for two times and the mean reward rises up immediately. In comparison, the mean rewards of $\pi_1$ and $\pi_2$ increase gradually, while the latter one has a larger oscillation. This is because the dataset is changing within every epoch for $\pi_2$.\\\\
+	2. Success Rate: The success rate curve for $\pi_0$ remains a line and the rate keeps 100\% after the first epoch. In comparison, the success rates of $\pi_1$ and $\pi_2$ increase to a high level after several epochs, with $\pi_1$ keeping steady and $\pi_2$ occasionally oscillating.\\\\
+	3. Training Loss: The training losses of $\pi_0$ and $\pi_1$ goes down gradually, but the second one is oscillating much stronger because only two expert episodes data are feeded into $\pi_1$. On the contrary, the training loss for $\pi_2$ keeps the same level all the time. There are several spikes appearing periodically, indicating that the training loss is decreasing within every epoch, but since the dataset is aggregated in every dagger iteraion, the training loss becomes large again when a new epoch begins.
+    
 \end{document}
