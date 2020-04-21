@@ -14,18 +14,18 @@ class Args(object):
         self.transform = tf.Compose([tf.ToTensor()])
         
         # data & log
-        self.data_path = './data'
+        self.datapath = './data'
         self.log_dir = './logdir'
         
         # expert
-        self.expert_Q = np.load('./expert_Q.npy')
+        self.Q = np.load('./expert_Q.npy')
         self.discretization = np.array([10,100])
         
         # train
-        self.num_expert_episode = 20
+        self.initial_episodes_to_use = 20
         self.batch_size = 128
         self.lr = 0.1
-        self.epoch = 2
+        self.num_epochs = 2
         self.optimizer = torch.optim.Adam(self.model.parameters(),self.lr)
         self.criterion = torch.nn.CrossEntropyLoss() 
         
@@ -37,8 +37,12 @@ class Args(object):
             self.max_dagger_iterations = 1
         
         # valid
-        self.record_frames = False
+        self.record_frames = True
         self.num_valid_episode = 5
+
+def get_args():
+    args = Args()
+    return args
 
 if __name__ == '__main__':
     args = Args()

@@ -1,12 +1,12 @@
 import numpy as np
 import torch
-from args import Args
+from args import get_args
 from load_expert_data import load_initial_data, process_individual_observation
 from generate_expert_trajectories import get_expert_action
 
 def execute_dagger(args):
     env = args.env
-    Q = args.expert_Q
+    Q = args.Q
     discretization = args.discretization
     model = args.model
     
@@ -36,7 +36,7 @@ def execute_dagger(args):
         state = next_state
     
     imitation_observations = np.delete(imitation_observations,0,axis=0)
-    expert_actions = np.delete(expert_actions,0,axis=0)
+    expert_actions = np.delete(expert_actions,0,axis=0).reshape(-1)
     
     return imitation_observations, expert_actions
 
@@ -44,12 +44,12 @@ def aggregate_dataset(training_observations, training_actions,
                       imitation_states, expert_actions):
     training_observations = np.vstack((training_observations,
                                        imitation_states))
-    training_actions = np.vstack((training_actions, expert_actions))
+    training_actions = np.hstack((training_actions, expert_actions))
 
     return training_observations, training_actions 
 
 if __name__ == '__main__':
-    args = Args()
+    args = get_args()
     imitation_observations, expert_actions = execute_dagger(args)
     training_observations, training_actions = load_initial_data(args)
     training_observations, training_actions = \

@@ -1,19 +1,15 @@
 import numpy as np
-import gym
 import torch
-import torchvision.transforms as tf
 from torch.utils.data import Dataset, DataLoader
 from os import path
 from glob import glob
 
 from args import Args
-from resize_observation import ResizeObservation
-
         
 def load_initial_data(args):
     num_file = 0
-    for file in glob(path.join(args.data_path, '*.npz')):
-        if num_file >= args.num_expert_episode: break
+    for file in glob(path.join(args.datapath, '*.npz')):
+        if num_file >= args.initial_episodes_to_use: break
         data = np.load(file)
         data_len = len(data['observations'])
         cur_observations = data['observations'].reshape(data_len,-1)
@@ -27,6 +23,8 @@ def load_initial_data(args):
             training_actions = np.vstack((training_actions,
                                           cur_actions))
         num_file += 1
+    training_actions = training_actions.reshape(-1)
+    
     return training_observations, training_actions
 
 def load_dataset(args, observations, actions, batch_size=64, data_transforms=None, num_workers=0):

@@ -1,6 +1,6 @@
 import torch
 
-from args import Args
+from args import get_args
 from load_expert_data import process_individual_observation
 from save_and_load import load_model
 
@@ -60,7 +60,7 @@ def get_average_performance(args, run_for=1000):
 
 
 if __name__ == '__main__':
-    args = Args()
+    args = get_args()
     args.model = load_model(args.env)
     
     # # visualize
