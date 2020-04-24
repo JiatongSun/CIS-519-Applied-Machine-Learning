@@ -31,12 +31,12 @@ class Args(object):
         self.initial_episodes_to_use = 2
         self.batch_size = 128
         self.lr = 0.1
-        self.num_epochs = 2
+        self.num_epochs = 20
         self.optimizer = torch.optim.Adam(self.model.parameters(),self.lr)
         self.criterion = torch.nn.CrossEntropyLoss() 
         
         # dagger
-        self.do_dagger = True
+        self.do_dagger = False
         if self.do_dagger:
             self.max_dagger_iterations = 18
         else:
